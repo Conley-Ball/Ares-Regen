@@ -38,15 +38,5 @@ function [rho_c,mu_c,k_c,Cp_c,st_c,T_sat_c,v_c,h_lg,rho_c_liquid,rho_c_vapor] = 
         v_c = mdot_f/(l_ch*w_ch*num*rho_c);
         h_lg = h_c_vapor-h_c_liquid;
 
-        rho_water_liquid_p = py.CoolProp.CoolProp.PropsSI('D', 'P', P_c, 'Q', 0, 'water');
-        rho_water_liquid_t = py.CoolProp.CoolProp.PropsSI('D', 'T', T_c, 'Q', 0, 'water');
-
-        mu_water_liquid = py.CoolProp.CoolProp.PropsSI('V', 'P', P_c, 'Q', 0, 'water');
-        mu_ethanol_liquid = py.CoolProp.CoolProp.PropsSI('V', 'P', P_c, 'Q', 0, 'ethanol');
-        mu_c_liquid = mu_water_liquid*(1-ratio)+mu_ethanol_liquid*ratio;
-
-        T_water_liquid = py.CoolProp.CoolProp.PropsSI('T', 'P', P_c, 'Q', 0, 'water');
-        P_water_liquid = py.CoolProp.CoolProp.PropsSI('P', 'T', T_water_liquid, 'Q', 0, 'water');
-        rho_water = py.CoolProp.CoolProp.PropsSI('D', 'P', P_water_liquid, 'T', T_water_liquid, 'water')
 
 end

@@ -1,95 +1,87 @@
 %% Rocket Project 2024-2025
-function [mx,p_stat,d_h,a,d,l_ch,w_ch,step,pos] = geometry(pc,gamma,l_c,th_in,th_out,d_c_in,l_c_ch,w_c_ch,nodes_c,l_conv,angle_conv,nodes_conv,l_div,d_t,d_e,l_div_ch,w_div_ch,nodes_div,th_l_ch,th_w_ch)
+function [A,D,M,P,l_ch,w_ch,D_h,step,pos] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,w_ch,num_ch,l_rib,D_c,gamma)
 
-%%
-th_l_ch = th_l_ch*0.0254; %m
-th_w_ch = th_w_ch*0.0254; %m
-%% Diverging calcs
-l_div_ch = l_div_ch*0.0254; %m
-w_div_ch = w_div_ch*0.0254; %m
-a_t = pi*d_t^2/4; %in^2
-a_e = d_e^2*pi/4; %in^2
-step_div = l_div/(nodes_div-1); %in
-pos_div = 0:step_div:l_div; %in
-slope_div = (a_t-a_e)./(l_div);
-slope_div_l = (th_l_ch-l_div_ch)/(l_div); %m/in
-slope_div_w = (th_w_ch-w_div_ch)/(l_div); %m/in
-a_div = slope_div.*pos_div+a_e; %in^2
-l_div_ch_array = slope_div_l.*pos_div+l_div_ch; %m
-w_div_ch_array = slope_div_w.*pos_div+w_div_ch; %m
-d_h_div = 4.*l_div_ch_array.*w_div_ch_array./(2*l_div_ch_array+2*w_div_ch_array); %m
-%Flow calcs
-for i=1:length(pc)
-    for j=1:length(pos_div)
-        mx_div(i,j) = flowisentropic(gamma(i), a_div(1,j)/a_t,'sup');
-        p_stat_div(i,j) = pc(i)*(1+(gamma(i)-1)/2*mx_div(i,j)^2)^(-gamma(i)/(gamma(i)-1)); %psi
-    end
-end
-%% Chamber calcs
-l_c_ch = l_c_ch*0.0254; %m
-w_c_ch = w_c_ch*0.0254; %m
-step_c = l_c/(nodes_c-1); %in
-pos_c = 0:step_c:l_c; %in
-d_c_out = d_c_in + 2*(th_in + w_c_ch/0.0254 + th_out); %in
-a_c = pi*d_c_in^2/4*ones(1,nodes_c); %in^2
-d_h_c = 4*l_c_ch*w_c_ch/(2*l_c_ch+2*w_c_ch)*ones(1,nodes_c); %m
-l_c_ch_array = l_c_ch*ones(1,nodes_c); %m
-w_c_ch_array = w_c_ch*ones(1,nodes_c); %m
-for i=1:length(pc)
-    for j=1:length(pos_div)
-        mx_c(i,j) = flowisentropic(gamma(i), a_c(j)/a_t, 'sub');
-        p_stat_c(i,j) = pc(i)*(1+(gamma(i)-1)/2*mx_c(i,j)^2)^(-gamma(i)/(gamma(i)-1)); %psi
-    end
-end
-%% Converging calcs
-angle_conv=tand(angle_conv);
-step_conv=l_conv/(nodes_conv-1); %in
-pos_conv=0:step_conv:l_conv; %in
-r1 = 0;
-r2= 0; 
-tol = 1e-7;
-error = 0.1;
-while error>tol
-    r1 = r1+error;
-    xa = (angle_conv*r1)/((1+angle_conv)^0.5);
-    ya = -(r1^2-xa^2)^0.5+d_t/2+r1;
-    ya1 = angle_conv*(xa-l_conv/2)+(d_c_in+d_t)/4;
-    error = ya-ya1;
-end
-tol=1e-5;
-error=0.1;
-while error>tol
-    r2 = r2+error;
-    xb = (l_conv+angle_conv^2*l_conv-angle_conv*r2*(angle_conv^2+1)^0.5)/(1+angle_conv^2);
-    yb = (r2^2-(xb-l_conv).^2).^0.5+d_c_in/2-r2;
-    yb1 = angle_conv*(xb-l_conv/2)+(d_c_in+d_t)/4;
-    error = yb1-yb;
-end
-pos_conv_1 = -(r1^2-(pos_conv).^2).^0.5+d_t/2+r1; %in
-pos_conv_2 = angle_conv*(pos_conv-l_conv/2)+(d_c_in+d_t)/4;
-pos_conv_3 = (r2^2-(pos_conv-l_conv).^2).^0.5+d_c_in/2-r2; %in
-slope_conv_l = (l_c_ch-th_l_ch)/(l_conv);
-slope_conv_w = (w_c_ch-th_w_ch)/(l_conv);
-d_conv = 2*cat(2,pos_conv_1(1:floor(xa/step_conv)),pos_conv_2(floor(xa/step_conv)+1:floor(xb/step_conv)),pos_conv_3(floor(xb/step_conv)+1:end)); %in
-a_conv = pi*d_conv.^2/4; %in^2
-l_conv_ch_array = slope_conv_l.*pos_conv+th_l_ch; %m
-w_conv_ch_array = slope_conv_w.*pos_conv+th_w_ch; %m
-d_h_conv = 4.*l_conv_ch_array.*w_conv_ch_array./(2*l_conv_ch_array+2*w_conv_ch_array); %m
-for i=1:length(pc)
-    for j=1:length(pos_conv)
-        mx_conv(i,j) = flowisentropic(gamma(i), a_conv(1,j)/a_t, 'sub');
-        p_stat_conv(i,j) = pc(i)*(1+(gamma(i)-1)/2*mx_conv(i,j)^2)^(-gamma(i)/(gamma(i)-1)); %psi
-    end
-end
+
+l_rao_bell = 0.8;
+resolution = 100;
+rao_i = 32.5;
+rao_f = 12;
+%% General Calcs
+mdot=Thrust/(C_star*C_star_eff*C_F*C_F_eff);%kg/s
+C_star=C_star*39.3701; %m/2 to in/s
+mdot=mdot*0.0057101471301634; % kg/s to slinches/s
+A_t = (C_star*C_star_eff*mdot)/Pc;
+D_t = sqrt(4*A_t/pi); %in
+M_e = sqrt((2/(gamma-1))*((Pc/Pe)^((gamma-1)/gamma)-1));
+A_e = A_t*((gamma+1)/2)^(-(gamma+1)/(2*gamma-2))*((1+((gamma-1)/2)*M_e^2)^((gamma+1)/(2*gamma-2)))/M_e;
+D_e = sqrt(4*A_e/pi);
+%% Diverging
+l_div = (l_rao_bell*(sqrt(A_e/A_t)-1)*D_t/2)/tand(15);
+t3 = linspace(-90, rao_i - 90, resolution);
+x3 = 0.382 * D_t / 2 .* cosd(t3);
+y3 = 0.382 * D_t / 2 * sind(t3) + 0.382 * D_t / 2 + D_t/2;
+n_x = x3(end);
+n_y = y3(end); 
+e_x = l_div;
+e_y = D_e/2;
+m_1 = tand(rao_i);
+m_2 = tand(rao_f);
+c_1 = n_y-m_1*n_x;
+c_2 = e_y-m_2*e_x;
+q_x = (c_2-c_1)/(m_1-m_2);
+q_y = (m_1*c_2-m_2*c_1)/(m_1-m_2);
+t4 = linspace(0,1,resolution);
+x4 = (1-t4).^2*n_x+2*(1-t4).*t4*q_x+t4.^2*e_x;
+y4 = (1-t4).^2*n_y+2*(1-t4).*t4*q_y+t4.^2*e_y;
+%% Converging
+t0 = linspace(90,45,resolution);
+x0 = (0.5258*D_t/2).*cosd(t0);
+y0 = D_c/2-0.5258*D_t/2+(0.5258*D_t/2).*sind(t0);
+t2 = linspace(-135,-90, resolution);
+x2 = 1.5*D_t/2*cosd(t2);
+y2 = 1.5*D_t/2*sind(t2)+1.5*D_t/2+D_t/2;
+x1_right_point = y0(end) + x0(end) - y2(1);
+x1 = linspace(x0(end),x1_right_point, (resolution/10)+2);
+y1 = linspace(y0(end), y2(1), (resolution/10)+2);
+x2 = x2 + (x1(end)+abs(x2(1)));
+%% Chamber
+f0 = @(var) interp1(x0, y0, var, 'spline');
+vol0 = pi*integral(@(x0) f0(x0).^2, x0(1), x0(end));
+f1 = @(var)interp1(x1, y1, var, 'spline');
+vol1 = pi*integral(@(x1)f1(x1).^2, x1(1), x1(end));
+f2 = @(var2)interp1(x2, y2, var2, 'spline');
+vol2 = pi*integral(@(x2)f2(x2).^2, x2(1), x2(end));
+vol_c = L_star * A_t;
+A_c = pi/4*D_c^2;
+vol_cc = vol_c - (vol0 + vol1 + vol2);
+L_c = vol_cc /(A_c);
+xc=linspace(-L_c,0,resolution);
+yc=D_c/2*ones(1,resolution);
 %% Full Geometry
-mx = [mx_div,mx_conv,mx_c];
-p_stat = [p_stat_div,p_stat_conv,p_stat_c]; %psi
-d_h = [d_h_div, d_h_conv, d_h_c]; %m
-a = [a_div,a_conv,a_c]; %in^2
-d = (4*a/pi).^0.5; %m
-l_ch = [l_div_ch_array,l_conv_ch_array,l_c_ch_array]; %m
-w_ch = [w_div_ch_array,w_conv_ch_array,w_c_ch_array]; %m
-step = [step_div*ones(1,nodes_div), step_conv*ones(1,nodes_conv), step_c*ones(1,nodes_c)]; %in
-pos = [pos_div,pos_conv+pos_div(nodes_div),pos_div(nodes_div)+pos_conv(nodes_conv)+pos_c]; %in
-plot(pos,d)
-axis equal
+pos = flip((cat(2,xc- x2(end),x0- x2(end),x1- x2(end), x2- x2(end), x3, x4))-x4(end))*-1;
+
+r = flip(cat(2, yc, y0, y1, y2, y3, y4));  
+
+
+D = 2*r;
+A = pi*r.^2;
+A_sup = A(1:length(y3)+length(y4));
+A_sub = A(length(y3)+length(y4):end);
+for i=1:length(A_sub)
+    M_sub(i) = flowisentropic(gamma,A_sub(i)/A_t,'sub');
+end
+for i=1:length(A_sup)
+    M_sup(i) = flowisentropic(gamma,A_sup(i)/A_t,'sup');
+end
+M = [M_sup M_sub];
+M = M(1,end-1);
+P = Pc * (1+(gamma-1)/2*M.^2).^(-gamma/(gamma-1));
+
+
+circ = 2*pi*r;
+step = diff(pos);
+%% Channels
+l_ch = circ/num_ch-l_rib;
+D_h = 4*w_ch*l_ch./(2*l_ch+2*w_ch);
+%% Gas
+end
