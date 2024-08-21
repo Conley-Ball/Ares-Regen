@@ -1,5 +1,5 @@
 %% Rocket Project 2024-2025
-function [A,D,M,P,l_ch,w_ch,D_h,step,pos] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,w_ch,num_ch,l_rib,D_c,gamma)
+function [A,D,M,P,l_ch,w_ch,D_h,step,pos,D_t,A_t] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,w_ch,num_ch,l_rib,D_c,gamma)
 
 
 l_rao_bell = 0.8;
@@ -65,6 +65,7 @@ r = flip(cat(2, yc, y0, y1, y2, y3, y4));
 
 D = 2*r;
 A = pi*r.^2;
+
 A_sup = A(1:length(y3)+length(y4));
 A_sub = A(length(y3)+length(y4):end);
 for i=1:length(A_sub)
@@ -75,8 +76,8 @@ for i=1:length(A_sup)
 end
 M = [M_sup M_sub];
 M = M(1,end-1);
-P = Pc * (1+(gamma-1)/2*M.^2).^(-gamma/(gamma-1));
 
+P = Pc * (1+(gamma-1)/2*M.^2).^(-gamma/(gamma-1));
 
 circ = 2*pi*r;
 step = diff(pos);
