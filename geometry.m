@@ -1,13 +1,14 @@
 %% Rocket Project 2024-2025
-function [A,D,M,P,l_ch,w_ch,D_h,step,pos,D_t,A_t] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,w_ch,num_ch,l_rib,D_c,gamma)
+function [A,D,M,P,l_ch,w_ch,D_h,step,pos,D_t,A_t,mdoti] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,w_ch,num_ch,l_rib,D_c,gamma)
 
 
 l_rao_bell = 0.8;
-resolution = 100;
+resolution = 15;
 rao_i = 32.5;
 rao_f = 12;
 %% General Calcs
 mdot=Thrust/(C_star*C_star_eff*C_F*C_F_eff);%kg/s
+mdoti = mdot;
 C_star=C_star*39.3701; %m/2 to in/s
 mdot=mdot*0.0057101471301634; % kg/s to slinches/s
 A_t = (C_star*C_star_eff*mdot)/Pc;
@@ -69,13 +70,19 @@ A = pi*r.^2;
 A_sup = A(1:length(y3)+length(y4));
 A_sub = A(length(y3)+length(y4):end);
 for i=1:length(A_sub)
+    if A_sub(i)/A_t < 1
+        A_sub(i) = A_t;
+    end
     M_sub(i) = flowisentropic(gamma,A_sub(i)/A_t,'sub');
 end
 for i=1:length(A_sup)
+    if A_sup(i)/A_t < 1
+        A_sup(i) = A_t;
+    end
     M_sup(i) = flowisentropic(gamma,A_sup(i)/A_t,'sup');
 end
 M = [M_sup M_sub];
-M = M(1,end-1);
+M = M(1:end-1);
 
 P = Pc * (1+(gamma-1)/2*M.^2).^(-gamma/(gamma-1));
 
