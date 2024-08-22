@@ -1,5 +1,5 @@
 function [E_iw,E_ow,E_avg,alpha_iw,alpha_ow,alpha_avg,nu_iw,nu_ow,nu_avg,k] = MatProperties_AlSi10Mg(T_iw,T_ow,T)
-% Material Properties for Additively Manufactured AlSi10Mg
+% Material Properties for Additively Manufactured Steel174ph
 % Source: Ansys Material Database
 
 %===PROPERTIES===
