@@ -1,68 +1,63 @@
-function [E_iw,E_ow,E_avg,alpha_iw,alpha_ow,alpha_avg,nu_iw,nu_ow,nu_avg,k] = MatProperties_Inconel718(T_iw,T_ow,T)
-% Material Properties for Additively Manufactured Inconel 718
+function [E_iw,E_ow,E_avg,alpha_iw,alpha_ow,alpha_avg,nu_iw,nu_ow,nu_avg,k] = MatProperties_AlSi10Mg(T_iw,T_ow,T)
+% Material Properties for Additively Manufactured AlSi10Mg
 % Source: Ansys Material Database
 
 %===PROPERTIES===
 % Density [kg/m^3]
-row_table = [293	8220;
-500	8121;
-700	8048;
-1000 7961;
-1200 7875;
-1400 7787;
-1533 7733;
-1617 7579;
-1723 7488;
-1800 7488;
-2100 7341];
+row_table = [295	2670;
+843	1710];
 
 % Elastic modulous [Pa]
-E_table = [294	165000000000;
-810	    152000000000;
-1088	110000000000;
-1255	55000000000;
-1366	34000000000];
+E_table = [298	76600000000;
+323	76100000000;
+373	74300000000;
+423	72700000000;
+473	70600000000;
+523	68900000000;
+573	67000000000];
 
 % Poison's Ratio
-nu_table = [294	0.3;
-810	    0.28;
-1088	0.323;
-1255	0.368;
-1366	0.4];
+nu_table = [298	0.33;
+323	0.33;
+373	0.33;
+423	0.33;
+473	0.33;
+523	0.33;
+573	0.33;];
 
 % Thermal Expansion [1/K]
-alpha_table = [700	1.44E-05;
-811	    1.49E-05;
-922	    1.54E-05;
-1144	1.75E-05;
-1366	1.83E-05;
-2100	1.83E-05];
+alpha_table = [373	2.06E-05;
+423	2.36E-05;
+473	2.47E-05;
+523	2.58E-05;
+573	3.04E-05;
+623	3.29E-05;
+673	2.71E-05;
+723	2.44E-05];
 
 % Thermal Conductivity [W/mK]
-k_table = [295	11.9;
-506	    13.7;
-721	    16.9;
-930	    21.7;
-1139	25.6;
-1352	22.9;
-1562	19.1;
-1773	17.7];
+k_table = [295	110;
+323	111;
+373	112;
+423	114;
+473	113;
+523	109;
+573	116;
+673	116;
+723	115;
+773	109;
+803	109;
+843	101;
+893	54;
+913	48;
+973	51];
 
 % Specific heat [J/kg]
-Cp_table = [293	421;
-373	    442;
-473	    453;
-573	    472;
-673	    481;
-773	    502;
-873	    527;
-973	    562;
-1073	606;
-1123	628;
-1173	636;
-1273	647;
-1373	651;
-1773	652];
+Cp_table = [295	91
+423	1010;
+548	1025;
+698	1136;
+823	1326];
 
 
 % ===Interpolation===
@@ -93,6 +88,4 @@ k = interp1(k_table(:,1), k_table(:,2), T, 'spline');
 % Specific heat [J/kg]
 Cp = interp1(Cp_table(:,1), Cp_table(:,2), T, 'spline');
 
-
 end
-
