@@ -2,60 +2,56 @@ clc; clear; close all;
 
 %% Inputs
 
-Pc = 400; % psi
+% CEA Inputs
+Pc = 413; % psia
+Pe = 13; % psia
 O_F = 1.1;
-gamma = 1.21;
-Cp_g = 3346; %J/kgK
-
-C_star = 1627.4; % m/s
-mu_g = 0.74167e-4; %Pa-s
-T_cns = 2861; % K
-k_w = 20; %W/m K
 T_inlet = 300; % K
 
+k_w = 20; %W/m K
 res = 0; % thermal resistance coating
-Thrust = 6672; % N
+Thrust = 1500; % lbf
 Pe = 13; % psi
-C_star_eff = 0.94;
-C_F = 1.4;
-C_F_eff = 0.9;
+C_star_eff = 1;
+C_F_eff = 1;
 L_star = 35; % in
-w_ch = 0.001/0.0254; % in
-num_ch = 60;
-l_rib = 0.001/0.0254; % in
+h_ch = 0.001/0.0254; % in
+w_ch_min = 0.001/0.0254; % in
+num_ch = 50;
+w_rib = 0.001/0.0254; % in
 D_c = 3.875; % in
-t_ins = 0.001; % m
-t_out = 0.0625*0.0254; % m
+t_ins = 0.001/0.0254; % in
+t_out = 0.0625; % in
+
+% CEA Outputs
+MW_g = [21.834   21.836   21.929   22.040];
+gamma = [1.1590   1.1591   1.1698   1.2082];
+mu_g = [0.96585  0.96454  0.91604  0.65672]*1e-4;
+Cp_g = [3.3244   3.3184   2.9049   2.1909]*1000;
+k_g = [5.6321   5.6144   4.5272   2.0893]*1e-1;
+Pr_g = [0.5701   0.5701   0.5878   0.6887];
+C_star = 1627.5;
+C_F = 1.4862;
+T_tot = 2863.55;
 
 %% Solution
 
-% [A,D,M,P,l_ch,w_ch,D_h,step,pos] = geometryAutomatic(Thrust,Pc,O_F,C_star,P_a,conv_angle,t_ins,t_out,L_star,gamma);
-% 
-
-% [C_star,C_F,gamma,MW_g,Cp_g,mu_g,T_cns] = CEAproperties(Pc,Pe,O_F,eth_ratio)
-
-[A,D,M,P,l_ch,w_ch,D_h,step,pos,D_t,A_t,mdot] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,w_ch,num_ch,l_rib,D_c,gamma);
-
-mdot_f = mdot*1/(1+O_F);
-A = A*0.0254^2; % m^2
-D = D*0.0254; % m
-D_h = D_h*0.0254; % m
-l_ch = l_ch*0.0254; % m
-l_rib = l_rib*0.0254; % m
-w_ch = w_ch*0.0254; % m
-step = step*0.0254; % m
-pos = pos*0.0254; % m
-P = P*6894.76; % Pa
-Pc = Pc*6894.76; % Pa
+num_nodes = 100;
+angle_conv = 40;
+[A,D,M,P,T,w_ch,h_ch,D_h,w_rib,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_tot,num_nodes);
+mdot_f = mdot*1/(1+O_F); %kg/s
 
 ratio = 0.75;
 
-D_t = D_t*0.0254; % m
-A_t = A_t*0.0254^2; % m^2
+% D_t = D_t*0.0254; % m
+% A_t = A_t*0.0254^2; % m^2
 
-[T_c,T_sat_c,P_c,q,T_wc,T_wr] = heatTransfer2D(Pc,M,P,A,D,D_h,l_ch,w_ch,l_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,C_star,T_cns,k_w,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res);
+[T_c,T_sat_c,P_c,q,T_wc,T_wr] = heatTransfer2D(Pc,M,P,A,D,D_h,w_ch,h_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,k_g,Pr_g,C_star,T,k_w,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res);
 
 P_c = P_c/6894.76; % psi
+
+Q = q(1:end-1).*D(1:end-1).*step*pi;
+Loss = sum(Q) % W
 
 figure (1)
 plot(pos,D/2)
