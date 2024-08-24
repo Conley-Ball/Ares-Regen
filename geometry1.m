@@ -1,4 +1,4 @@
-function [A,D,M,P,l_ch,w_ch,D_h,step,pos,D_t,A_t,mdoti] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,w_ch,num_ch,l_rib,D_c,gamma,th_in,num_nodes)
+function [A,D,M,P,l_ch,w_ch,D_h,step,pos,D_t,A_t,mdoti] = geometry1(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,w_ch,num_ch,l_rib,D_c,gamma,th_in,num_nodes)
 %% Conversions
 Pc = Pc*6894.76;
 Pe = Pe*6894.76;
