@@ -1,5 +1,5 @@
 %Rocket Project Ares 2024-2025
-function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_tot,num_nodes)
+function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_tot,num_nodes)
 
 
     %% Geometry inputs
@@ -195,6 +195,8 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,
     pos_div = length(x_div);
     pos_conv = length(x_conv);
     pos_c = length(xc);
+    id_th = pos_div;
+    id_c = pos_div+pos_conv;
 
     %gamma is combined
     MW_g = [linspace(MW_g(4),MW_g(3), pos_div),linspace(MW_g(3),MW_g(2),pos_conv),linspace(MW_g(2),MW_g(1),pos_c)];

@@ -2,6 +2,7 @@ function [T_c,T_sat_c,P_c,q,T_wc,T_wr] = heatTransfer2D(Pc,M,P,A,D,D_h,w_ch,h_ch
     T_c = zeros(1,length(pos));
     P_c = zeros(1,length(pos));
     q = zeros(1,length(pos));
+    T = T*C_star_eff^2;
 
     h_ch = h_ch*ones(1,length(w_ch));
     step = [step 1];
@@ -10,12 +11,14 @@ function [T_c,T_sat_c,P_c,q,T_wc,T_wr] = heatTransfer2D(Pc,M,P,A,D,D_h,w_ch,h_ch
     pgs = 0;
     T = T*C_star_eff^2;
     P_c_inj = 0;
-    P_c_prev = Pc;
-    tol = 100;
+    P_c_prev = Pc*1.5;
+    tol = 6000;
     
     while abs(P_c_inj-Pc) > tol
-        P_c(1) = P_c_prev+Pc-P_c_inj;
         P_c_prev = P_c(1);
+        plot(pos,P_c)
+        P_c = zeros(1,length(pos));
+        P_c(1) = P_c_prev+Pc-P_c_inj;
         for i=1:length(pos)
             %% Coolant Properties
             [rho_c,mu_c,k_c,Cp_c,T_sat_c(i),v_c,h_lg,rho_c_liquid,rho_c_vapor] = coolant(T_c(i),P_c(i),ratio,mdot_f,w_ch(i),h_ch(i),num);
@@ -114,8 +117,10 @@ function [T_c,T_sat_c,P_c,q,T_wc,T_wr] = heatTransfer2D(Pc,M,P,A,D,D_h,w_ch,h_ch
             if i+1 <= length(pos)
                 if D_h(i+1) < D_h(i)
                     K_L = ((D_h(i)/D_h(i+1))^2-1)^2;
-                else
+                elseif D_h(i+1) > D_h(i)
                     K_L = 0.5-0.167*(D_h(i+1)/D_h(i))-0.125*(D_h(i+1)/D_h(i))^2-0.208*(D_h(i+1)/D_h(i))^3;
+                else
+                    K_L = 0;
                 end
                 P_c(i+1) = P_c(i) - rho_c*v_c^2/2*(K_L+f*step(i)/D_h(i)); % Pa
                 T_c(i+1) = T_c(i) + pi*D(i)*step(i)*q(i)/(mdot_f*Cp_c); % K
