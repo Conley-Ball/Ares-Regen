@@ -5,6 +5,7 @@ numel = 2;
 % WALL TEMPS [K] (arbitaryly choosen)
 T_iw = [650 500];
 T_ow = [600 450];
+T = 1500;
 
 % ENGINE PROPERTIES (arbitaryly choosen)
 % ===Design Choosen===
@@ -43,9 +44,8 @@ deltaP = 206843;
 P0 = 101325;  % [Pa]
 
 
-% Material properties [Inconel 718]
-[E_iw,E_ow,E_avg,alpha_iw,alpha_ow,alpha_avg,nu_iw,nu_ow,nu_avg] = MatProperties_Inconel718(T_iw,T_ow);
-
+% Material properties
+[row,E,E_iw,E_ow,E_avg,nu,nu_iw,nu_ow,nu_avg,alpha,alpha_iw,alpha_ow,alpha_avg,k,Cp,Yield] = MatProperties_AlSi10Mg(T_iw,T_ow,T)
 
 % Stress Calcs
 [stress_total,stress_T_ow, stress_T_iw, stress_T_s, stress_T_c,stress_P_b, stress_P_c, stress_P_s, stress_P_t, stress_P_hoop, stress_P_a] = Stress_v1_BL(T_iw,T_ow,E_iw,E_ow,E_avg,alpha_iw,alpha_ow,alpha_avg,nu_iw,nu_ow,nu_avg,t_iw,t_ow,h,w,d,r_ow,r_iw,deltaP,P_chamber,A_wall,A_cc,numel)
