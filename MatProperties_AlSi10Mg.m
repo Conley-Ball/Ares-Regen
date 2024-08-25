@@ -1,6 +1,12 @@
-function [E_iw,E_ow,E_avg,alpha_iw,alpha_ow,alpha_avg,nu_iw,nu_ow,nu_avg,k] = MatProperties_AlSi10Mg(T_iw,T_ow,T)
+function [row,E,E_iw,E_ow,E_avg,nu,nu_iw,nu_ow,nu_avg,alpha,alpha_iw,alpha_ow,alpha_avg,k,Cp,Yield] = MatProperties_AlSi10Mg(T_iw,T_ow,T)
 % Material Properties for Additively Manufactured AlSi10Mg
 % Source: Ansys Material Database
+%{ There are memory and performance benefits to using "griddedInterpolant" objects over the "interp" functions. 
+% griddedInterpolant offers substantial performance improvements for repeated queries of the interpolant object, 
+% whereas the interp functions perform a new calculation each time they are called. Also, griddedInterpolant 
+% stores the sample points in a memory-efficient format (as a compact grid) and is multithreaded to take 
+% advantage of multicore computer processors.
+%}
 
 %===PROPERTIES===
 % Density [kg/m^3]
@@ -59,33 +65,63 @@ Cp_table = [295	91
 698	1136;
 823	1326];
 
+% Yield Strength [Pa]
+Yield_table = [298	251000000;
+373	232000000;
+423	221000000;
+473	197000000;
+523	148000000];
+
 
 % ===Interpolation===
 % Density [kg/m^3]
-row = interp1(row_table(:,1), row_table(:,2), T, 'spline');
+%row = interp1(row_table(:,1), row_table(:,2), T, 'spline', 'extrap');
+row_interp = griddedInterpolant(row_table(:,1), row_table(:,2));
+row = row_interp(T);
 
 % Elastic modulous [Pa]
-E = interp1(E_table(:,1), E_table(:,2), T, 'spline');
-E_iw = interp1(E_table(:,1), E_table(:,2), T_iw, 'spline');
-E_ow = interp1(E_table(:,1), E_table(:,2), T_ow, 'spline');
+% E = interp1(E_table(:,1), E_table(:,2), T, 'spline', 'extrap');
+% E_iw = interp1(E_table(:,1), E_table(:,2), T_iw, 'spline', 'extrap');
+% E_ow = interp1(E_table(:,1), E_table(:,2), T_ow, 'spline', 'extrap');
+E_interp = griddedInterpolant(E_table(:,1), E_table(:,2));
+E = E_interp(T);
+E_iw = E_interp(T_iw);
+E_ow = E_interp(T_ow);
 E_avg = (E_iw+E_ow)/2;
 
 % Poison's Ratio
-nu = interp1(nu_table(:,1), nu_table(:,2), T, 'spline');
-nu_iw = interp1(nu_table(:,1), nu_table(:,2), T_iw, 'spline');
-nu_ow = interp1(nu_table(:,1), nu_table(:,2), T_ow, 'spline');
+% nu = interp1(nu_table(:,1), nu_table(:,2), T, 'spline');
+% nu_iw = interp1(nu_table(:,1), nu_table(:,2), T_iw, 'spline', 'extrap');
+% nu_ow = interp1(nu_table(:,1), nu_table(:,2), T_ow, 'spline', 'extrap');
+nu_interp = griddedInterpolant(nu_table(:,1), nu_table(:,2));
+nu = nu_interp(T);
+nu_iw = nu_interp(T_iw);
+nu_ow = nu_interp(T_ow);
 nu_avg = (nu_iw+nu_ow)/2;
 
 % Thermal Expansion [1/K]
-alpha = interp1(alpha_table(:,1), alpha_table(:,2), T, 'spline');
-alpha_iw = interp1(alpha_table(:,1), alpha_table(:,2), T_iw, 'spline');
-alpha_ow = interp1(alpha_table(:,1), alpha_table(:,2), T_ow, 'spline');
-alpha_avg = (nu_iw+nu_ow)/2;
+% alpha = interp1(alpha_table(:,1), alpha_table(:,2), T, 'spline', 'extrap');
+% alpha_iw = interp1(alpha_table(:,1), alpha_table(:,2), T_iw, 'spline', 'extrap');
+% alpha_ow = interp1(alpha_table(:,1), alpha_table(:,2), T_ow, 'spline', 'extrap');
+alpha_interp = griddedInterpolant(alpha_table(:,1), alpha_table(:,2));
+alpha = alpha_interp(T);
+alpha_iw = alpha_interp(T_iw);
+alpha_ow = alpha_interp(T_ow);
+alpha_avg = (alpha_iw+alpha_ow)/2;
 
 % Thermal Conductivity [W/mK]
-k = interp1(k_table(:,1), k_table(:,2), T, 'spline');
+% k = interp1(k_table(:,1), k_table(:,2), T, 'spline', 'extrap');
+k_interp = griddedInterpolant(k_table(:,1), k_table(:,2));
+k = k_interp(T);
 
 % Specific heat [J/kg]
-Cp = interp1(Cp_table(:,1), Cp_table(:,2), T, 'spline');
+% Cp = interp1(Cp_table(:,1), Cp_table(:,2), T, 'spline', 'extrap');
+Cp_interp = griddedInterpolant(Cp_table(:,1), Cp_table(:,2));
+Cp = Cp_interp(T);
+
+% Yield Strength [Pa]
+% Yield = interp1(Yield_table(:,1), Yield_table(:,2), T, 'spline', 'extrap');
+Yield_interp = griddedInterpolant(Yield_table(:,1), Yield_table(:,2));
+Yield = Yield_interp(T);
 
 end
