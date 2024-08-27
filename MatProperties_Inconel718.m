@@ -1,4 +1,4 @@
-function [row,E,E_iw,E_ow,E_avg,nu,nu_iw,nu_ow,nu_avg,alpha,alpha_iw,alpha_ow,alpha_avg,k,Cp,Yield] = MatProperties_Inconel718(T_iw,T_ow,T)
+function [row,E,nu,alpha,k,Cp,Yield] = MatProperties_Inconel718(T)
 % Material Properties for Additively Manufactured Inconel 718
 % Source: Ansys Material Database
 %{ There are memory and performance benefits to using "griddedInterpolant" objects over the "interp" functions. 
@@ -86,23 +86,14 @@ row = row_interp(T);
 % Elastic modulous [Pa]
 E_interp = griddedInterpolant(E_table(:,1), E_table(:,2));
 E = E_interp(T);
-E_iw = E_interp(T_iw);
-E_ow = E_interp(T_ow);
-E_avg = (E_iw+E_ow)/2;
 
 % Poison's Ratio
 nu_interp = griddedInterpolant(nu_table(:,1), nu_table(:,2));
 nu = nu_interp(T);
-nu_iw = nu_interp(T_iw);
-nu_ow = nu_interp(T_ow);
-nu_avg = (nu_iw+nu_ow)/2;
 
 % Thermal Expansion [1/K]
 alpha_interp = griddedInterpolant(alpha_table(:,1), alpha_table(:,2));
 alpha = alpha_interp(T);
-alpha_iw = alpha_interp(T_iw);
-alpha_ow = alpha_interp(T_ow);
-alpha_avg = (alpha_iw+alpha_ow)/2;
 
 % Thermal Conductivity [W/mK]
 k_interp = griddedInterpolant(k_table(:,1), k_table(:,2));
