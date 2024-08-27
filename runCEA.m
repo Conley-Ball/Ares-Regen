@@ -1,6 +1,7 @@
 % Output: area ratio, C*, thrust coefficient, gamma, gas molecular weight, 
-% gas specific heat, gas dynamic viscosity, near-side chamber wall gas temperature
-function [AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, T_cns] = runCEA(Pc, Pe, OF, eth_frac)
+% gas specific heat, gas dynamic viscosity, near-side chamber wall gas 
+% temperature, prandtl number
+function [AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, T_cns, Pr_g] = runCEA(Pc, Pe, OF, eth_frac)
     k = 1.129;    % Choose starting exit gamma
     gamma(3) = 0; % CEA exit gamma
     
@@ -33,22 +34,32 @@ function [AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, T_cns] = runCEA(Pc, Pe, OF, 
                                   'T', DimVar(90.17,'K'),       ...         
                                   'Q', DimVar(1,'kg'))];        
         
-        % Run CEA
+        % Run CEA for gamma (CEA.Run only allows 8 outputs at a time)
         data = CEA.Run(reactants,               ...
                        'ProblemType', 'Rocket', ...
                        'Flow', 'eq',            ...
                        'Pc', DimVar(Pc,'psi'),  ...
                        'O/F', OF,               ...
                        'supar', AR,             ...
-                       'Outputs', {'t','isp','cp','mw','gamma','cf','vis','cond'});
-    
-        % Data output
-        C_star = data.isp(3).Value * 9.80665 / data.cf(3);
-        C_F    = [data.cf(1), data.cf(2), data.cf(3)];
-        gamma  = [data.gamma(1), data.gamma(2), data.gamma(3)];
-        MW_g   = [data.MolarMass(1).Value, data.MolarMass(2).Value, data.MolarMass(3).Value];
-        Cp_g   = [data.cp(1).Value, data.cp(2).Value, data.cp(3).Value];
-        mu_g   = [data.vis(1), data.vis(2), data.vis(3)];
-        T_cns  = [data.Temperature(1).Value, data.Temperature(2).Value, data.Temperature(3).Value];  
+                       'Outputs', {'gamma'});
+
+        gamma  = [data.gamma(1), data.gamma(2), data.gamma(3)];    
     end
+    
+    data = CEA.Run(reactants,               ...
+                   'ProblemType', 'Rocket', ...
+                   'Flow', 'eq',            ...
+                   'Pc', DimVar(Pc,'psi'),  ...
+                   'O/F', OF,               ...
+                   'supar', AR,             ...
+                   'Outputs', {'t','isp','cp','mw','cf','vis','cond','pran'});
+
+    % Data output
+    C_star = data.isp(3).Value * 9.80665 / data.cf(3);
+    C_F    = [data.cf(1), data.cf(2), data.cf(3)];
+    MW_g   = [data.MolarMass(1).Value, data.MolarMass(2).Value, data.MolarMass(3).Value];
+    Cp_g   = [data.cp(1).Value, data.cp(2).Value, data.cp(3).Value];
+    mu_g   = [data.vis(1), data.vis(2), data.vis(3)];
+    T_cns  = [data.Temperature(1).Value, data.Temperature(2).Value, data.Temperature(3).Value];  
+    Pr_g   = [data.pran(1), data.pran(2), data.pran(3)];
 end
