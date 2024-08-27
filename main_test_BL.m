@@ -45,7 +45,12 @@ P0 = 101325;  % [Pa]
 
 
 % Material properties
-[row,E,E_iw,E_ow,E_avg,nu,nu_iw,nu_ow,nu_avg,alpha,alpha_iw,alpha_ow,alpha_avg,k,Cp,Yield] = MatProperties_AlSi10Mg(T_iw,T_ow,T)
+[row_iw,E_iw,nu_iw,alpha_iw,k_iw,Cp_iw,Yield_iw] = MatProperties_AlSi10Mg(T_iw)
+[row_ow,E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = MatProperties_AlSi10Mg(T_ow)
+% Average inner and outer wall
+E_avg = (E_iw+E_ow)/2;
+alpha_avg = (alpha_iw+alpha_ow)/2;
+nu_avg = (nu_iw+nu_ow)/2;
 
 % Stress Calcs
 [stress_total,stress_T_ow, stress_T_iw, stress_T_s, stress_T_c,stress_P_b, stress_P_c, stress_P_s, stress_P_t, stress_P_hoop, stress_P_a] = Stress_v1_BL(T_iw,T_ow,E_iw,E_ow,E_avg,alpha_iw,alpha_ow,alpha_avg,nu_iw,nu_ow,nu_avg,t_iw,t_ow,h,w,d,r_ow,r_iw,deltaP,P_chamber,A_wall,A_cc,numel)
