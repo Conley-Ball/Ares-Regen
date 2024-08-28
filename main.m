@@ -51,40 +51,18 @@ ratio = 0.75;
 
 % ===STRESS===
 % Temperature Dependent Material properties
-% Is averaging these temps the right approach???
 % Inner Wall
-T_iw = (T_rhg+T_chg)/2;
-T_iw = double(T_iw);
-[row_iw,E_iw,nu_iw,alpha_iw,k_iw,Cp_iw,Yield_iw] = MatProperties_Steel174ph(T_iw);
+T_chg = eval(T_chg);
+[row_iw,E_iw,nu_iw,alpha_iw,k_iw,Cp_iw,Yield_iw] = MatProperties_Steel174ph(T_chg);
 % Outer Wall
-T_ow = (T_ro+T_co)/2;
-T_ow = double(T_ow);
-[row_ow,E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = MatProperties_Steel174ph(T_ow);
+T_ro = eval(T_ro);
+[row_ow,E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = MatProperties_Steel174ph(T_ro);
 
-% TEMPORARY VARIABLE NAME CONVERSION (Will update code)
-t_iw = t_ins;
-t_ow = t_out;
-N = num_ch;
-h = h_ch;
-w = w_rib;
-d = w_ch_min;
-r_iw = D_c/2;
-r_ow = r_iw+t_iw+d+t_ow;
-deltaP = 206843;  % Pressure difference [Pa] channel(higher) to chamber (30  psi)
-P_chamber = Pc*6895; % [psi to Pa]
-A_channels = N*h*d;
-A_wall = pi*(r_ow.^2 - r_iw.^2) - A_channels;
-A_chamber = pi*r_iw.^2;
-A_throat = pi*(D_t/2).^2;
-A_cc = A_chamber-A_throat;
-
-% Conley's function call
-%[stress_total,stress_T_ow, stress_T_iw, stress_T_s, stress_T_c,stress_P_b, stress_P_c, stress_P_s, stress_P_t, stress_P_hoop, stress_P_a,yield] = stress(T_ow,T_iw,E_iw,E_ow,alpha_iw,alpha_ow,nu_iw,nu_ow,P,P_c,A,D,w_ch,w_rib,t_ins,h_ch,t_out,num_ch);
-% Brandon's function call
-[stressTotal,stressTow, stressTiw, stressTs, stressTc, stressPb, stressPs, stressPt, stressP_hoopow, stressP_hoopiw, stressPa,vonMises] = stress(T_iw,T_ow,E_iw,E_ow,alpha_iw,alpha_ow,nu_iw,nu_ow,t_iw,t_ow,h,w,d,r_ow,r_iw,deltaP,P_chamber,A_wall,A_cc)
+% Stress function call
+[stressTow, stressTiw, stressTs, stressTc, stressPb, stressPs, stressPt, stressP_hoop, stressPa, vonMises] = stress(T_chg,T_ro,E_iw,E_ow,alpha_iw,alpha_ow,nu_iw,nu_ow,t_ins,t_out,w_ch,w_rib,h_ch,D_c,P_c,P,num_ch,A_t)
 
 % Total Inner wall stress only
-stressTotaliw = stressTiw + stressP_hoopiw;
+stressTotaliw = stressTiw + stressP_hoop;
 % ===========
 
 
