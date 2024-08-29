@@ -1,4 +1,4 @@
-function [stressTow, stressTiw, stressTs, stressTc, stressPb, stressPs, stressPt, stressP_hoop, stressPa, vonMises] = stress(T_chg,T_ro,E_iw,E_ow,alpha_iw,alpha_ow,nu_iw,nu_ow,t_ins,t_out,w_ch,w_rib,h_ch,D_c,P_c,P,num_ch,A_t)
+function [stressTow, stressTiw, stressTs, stressTc, stressPb, stressPs, stressPcoolant, stressP_hoop, stressPa, vonMises] = stress(T_ci,T_co,E_iw,E_ow,alpha_iw,alpha_ow,nu_iw,nu_ow,t_ins,t_out,w_ch,w_rib,h_ch,D_c,P_c,P,num_ch,A_t,pos)
 %{ =====STRESS===== 
 % Total Stress calculation at each cross section
 
@@ -30,13 +30,13 @@ A_cc = A_chamber-A_t;
 
 % THERMAL STRESS [Pa]
 % Circumferential stress outer wall  [(1)B3,p120] ()
-stressTow = ((alpha_ow.*E_ow.*(T_chg-T_ro))./(1-nu_ow)).*(t_ins./(t_ins+t_out));
+stressTow = ((alpha_ow.*E_ow.*(T_ci-T_co))./(1-nu_ow)).*(t_ins./(t_ins+t_out));
 % Circumferential stress inner wall [(1)B4,p121]  ()
-stressTiw = ((alpha_iw.*E_iw.*(T_chg-T_ro))./(1-nu_iw)).*(t_out./(t_ins+t_out));
+stressTiw = ((alpha_iw.*E_iw.*(T_ci-T_co))./(1-nu_iw)).*(t_out./(t_ins+t_out));
 % Shear Stress max [(1)B4,p121] ()
-stressTs = ( (alpha_avg.*E_avg.*(T_chg-T_ro))./(5.*w_rib.*(1-nu_avg)) ) .* ((t_out.*t_ins)./(t_ins+t_out).^2) .* (w_ch+w_rib);
+stressTs = ( (alpha_avg.*E_avg.*(T_ci-T_co))./(5.*w_rib.*(1-nu_avg)) ) .* ((t_out.*t_ins)./(t_ins+t_out).^2) .* (w_ch+w_rib);
 % Compression Stress max [(1)B4,p121]  ()
-stressTc = ( (alpha_avg.*E_avg.*(T_chg-T_ro)) ./ ((w_rib.*r_ow./(w_ch+w_rib)).*(1-nu_avg)) ) .* ((t_out.*t_ins)./(t_ins+t_out));
+stressTc = ( (alpha_avg.*E_avg.*(T_ci-T_co)) ./ ((w_rib.*r_ow./(w_ch+w_rib)).*(1-nu_avg)) ) .* ((t_out.*t_ins)./(t_ins+t_out));
 
 % PRESSURE STRESS [Pa]
 % Maximum bending stress  [(1)A3,p111] ()
@@ -48,14 +48,17 @@ stressP_hoop = deltaP.*r_bar./(t_ins+t_out);
 % Axial 
 stressPa = P_chamber.*A_cc./A_wall;
 
-% {PUT IF STATEMENT HERE}
-% if
-% If Chamber pressure greater than coolant preasure: Compressive loading, ribs  (ignore for von mises)
-% stressPc = (deltaP/w).*(h+w);
-% (Expecting this) If Chamber pressure less than coolant preasure: Tensile stress, ribs (ignore for von mises)
-stressPt = (deltaP./w_rib).*w_ch;
-% end
-
+% PRESSURE STRESS on Ribs [Pa]
+[stressPcoolant] = deal(zeros(1,length(pos)));
+for i=1:length(pos)
+    if P > P_c
+    % If Chamber pressure greater than coolant preasure: Compressive loading, ribs  (ignore for von mises)
+        stressPcoolant(i) = (deltaP(i)/w_rib)*(w_ch(i)+w_rib(i));
+    else
+    % (Expecting this) If Chamber pressure less than coolant preasure: Tensile stress, ribs (ignore for von mises)
+        stressPcoolant(i) = (deltaP(i)/w_rib)*w_ch(i);
+    end
+end
 
 % Von Mises maximum distortion energy theory
 % failure by yielding occurs when, at any point in the body, the distortion energy per unit volume 
@@ -65,9 +68,9 @@ stressPt = (deltaP./w_rib).*w_ch;
 stressTotalAxial = stressPa;
 stressTotalRadial = stressTc + stressPb;
 stressTotalHoop = stressTow + stressTiw + stressP_hoop;
-stressTotalTow = stressTs+stressPs;
+% stressTotalTow = stressTs+stressPs;
 
-vonMises = sqrt( (1/2).*((stressTotalAxial-stressTotalRadial).^2 + (stressTotalRadial-stressTotalHoop).^2 + (stressTotalHoop-stressTotalAxial).^2 )+3.*stressTotalTow.^2);
+vonMises = sqrt( (1/2).*((stressTotalAxial-stressTotalRadial).^2 + (stressTotalRadial-stressTotalHoop).^2 + (stressTotalHoop-stressTotalAxial).^2 )+3.*(stressTs.^2+stressPs.^2));
 
 end
 
