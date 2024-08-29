@@ -52,17 +52,16 @@ ratio = 0.75;
 % ===STRESS===
 % Temperature Dependent Material properties
 % Inner Wall
-T_chg = eval(T_chg);
-[row_iw,E_iw,nu_iw,alpha_iw,k_iw,Cp_iw,Yield_iw] = MatProperties_Steel174ph(T_chg);
+T_ci = eval(T_ci);
+[row_iw,E_iw,nu_iw,alpha_iw,k_iw,Cp_iw,Yield_iw] = MatProperties_Steel174ph(T_ci);
 % Outer Wall
-T_ro = eval(T_ro);
-[row_ow,E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = MatProperties_Steel174ph(T_ro);
+T_co = eval(T_co);
+[row_ow,E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = MatProperties_Steel174ph(T_co);
 
 % Stress function call
-[stressTow, stressTiw, stressTs, stressTc, stressPb, stressPs, stressPt, stressP_hoop, stressPa, vonMises] = stress(T_chg,T_ro,E_iw,E_ow,alpha_iw,alpha_ow,nu_iw,nu_ow,t_ins,t_out,w_ch,w_rib,h_ch,D_c,P_c,P,num_ch,A_t)
-
+[vonMises] = stress(T_ci,T_co,E_iw,E_ow,alpha_iw,alpha_ow,nu_iw,nu_ow,t_ins,t_out,w_ch,w_rib,h_ch,D_c,P_c,P,num_ch,A_t,pos);
 % Total Inner wall stress only
-stressTotaliw = stressTiw + stressP_hoop;
+%stressTotaliw = stressTiw + stressP_hoop;
 % ===========
 
 
@@ -138,12 +137,12 @@ clf
 hold on
 xline(pos(id_th), '--', 'Throat','HandleVisibility','off')
 xline(pos(id_c), '--', 'Chamber','HandleVisibility','off')
-plot(pos,stressTotaliw/6895000,'LineWidth',1)
+plot(pos,vonMises/6895000,'LineWidth',1)
 plot(pos,Yield_iw/6895000,'LineWidth',1)
 xline(0, '--', 'Exit','HandleVisibility','off')
 hold off
 title('Stress')
 xlabel('Axial Distance (m)')
 ylabel('Stress (ksi)')
-legend('Inner Wall Stress','Inner Wall Yield')
+legend('vonMises','Inner Wall Yield')
 grid on
