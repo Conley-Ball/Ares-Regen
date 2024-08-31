@@ -1,5 +1,5 @@
 %Rocket Project Ares 2024-2025
-function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_tot,num_nodes)
+function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes)
 
 
     %% Geometry inputs
@@ -225,7 +225,7 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     M = [M_sup M_sub];
     %static pressure is computed using the local mach number
     P = Pc * (1+(gamma-1)/2.*M.^2).^(-gamma/(gamma-1)); %pa
-    T = (1+(gamma-1)/2.*M.^2).^-1*T_tot;
+    T = T_thr*(1+(gamma-1)/2);
 
 
 

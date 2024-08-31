@@ -8,19 +8,18 @@ Pe = 13.7; % psia
 O_F = 1.1;
 T_inlet = 300; % K
 
-k_w = 20; %W/m K
 res = 0; % thermal resistance coating
 Thrust = 1600; % lbf
 %Pe = 13; % psi 
 C_star_eff = 0.94;
 C_F_eff = 0.9;
-L_star = 35; % in
-h_ch = 0.001/0.0254; % in
-w_ch_min = 0.001/0.0254; % in
+L_star = 28; % in
+h_ch = 0.000635/0.0254; % in
+w_ch_min = 0.000635/0.0254; % in
 %num_ch = 50;
-w_rib = 0.001/0.0254; % in
+w_rib = 0.000381/0.0254; % in
 D_c = 3.875; % in
-t_ins = 0.001/0.0254; % in
+t_ins = 0.00042/0.0254; % in
 t_out = 0.001/0.0254; % in
 
 % CEA Outputs
@@ -32,30 +31,30 @@ k_g = [5.6321   5.6144   4.5272   2.0893]*1e-1;
 Pr_g = [0.5701   0.5701   0.5878   0.6887];
 C_star = 1627.5;
 C_F = 1.4862;
-T_tot = 2863.55;
+T_thr = 2657.58*C_star_eff^2;
 
 %% Solution
 
-num_nodes = 50;
+num_nodes = 300;
 angle_conv = 40;
-[A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_tot,num_nodes);
+[A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes);
 mdot_f = mdot*1/(1+O_F); %kg/s
 
 ratio = 0.75;
 
 % D_t = D_t*0.0254; % m
 % A_t = A_t*0.0254^2; % m^2
-
-[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct] = heatTransfer2D(Pc,M,P,A,D,D_h,w_ch,h_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,k_g,Pr_g,C_star,T,k_w,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res);
-
+tic
+[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res);
+toc
 
 % ===STRESS===
 % Temperature Dependent Material properties
 % Inner Wall
-T_ci = eval(T_ci);
+% T_ci = eval(T_ci);
 [row_iw,E_iw,nu_iw,alpha_iw,k_iw,Cp_iw,Yield_iw] = MatProperties_Steel174ph(T_ci);
 % Outer Wall
-T_co = eval(T_co);
+% T_co = eval(T_co);
 [row_ow,E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = MatProperties_Steel174ph(T_co);
 
 % Stress function call
