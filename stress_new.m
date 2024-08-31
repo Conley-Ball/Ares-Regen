@@ -6,9 +6,6 @@ function [v_m_stress] = stress_new(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,E
 %changed plot to v_m_stress
 %commented out "stressTotaliw = stressTiw + stressP_hoop" line as its not no longer needed
 
-T_ci=eval(T_ci);
-T_co=eval(T_co);
-
 for i = 1:length(pos)
 q = P_c(i) - P(i);
 r0 = D(i)/2+t_ins+h_ch+t_out; 

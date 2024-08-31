@@ -25,7 +25,7 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct]
 
     T_c(1) = T_inlet;
     pgs = 0;
-    P_c_inj = 0;
+    P_c_inj = -Pc;
     tol = 6894.76;
     
     while abs(P_c_inj-Pc) > tol
