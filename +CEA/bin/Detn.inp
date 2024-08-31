@@ -1,0 +1,5 @@
+problem  rkt eq o/f=   1.1000 p,bar=    28.48 supar=   5.4551 
+ reactants 
+ reac fu = C2H5OH(L) h,j/mol=-100000 w%=0.375 t(k)=300 fu = H2O(L) h,j/mol=-100000 w%=0.125 t(k)=300 ox = O2(L) w%=0.5 t(k)=90.17 
+ output plot trans gamma
+ end
