@@ -18,6 +18,27 @@ num_vals_w_rib = 2;
 num_vals_t_ins = 2;
 num_vals_h_ch = 1;
 
+%CEA Inputs
+Pc = 413; % psia
+Pe = 13.7; % psia
+O_F = 1.1;
+T_inlet = 300; % K
+
+res = 0; % thermal resistance coating
+Thrust = 1600; % lbf
+%Pe = 13; % psi 
+C_star_eff = 0.94;
+C_F_eff = 0.9;
+L_star = 28; % in
+
+t_out = 0.001/0.0254; % in
+
+ratio = 0.75;
+
+%% CEA Function
+
+[AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, k_g, T_thr, Pr_g] = runCEA(Pc, Pe, O_F, ratio);
+T_thr = T_thr*C_star_eff;
 
 %%
 % generate values
@@ -26,6 +47,11 @@ w_rib = linspace(w_rib_start, w_rib_end, num_vals_w_rib);
 t_ins = linspace(t_ins_start, t_ins_end, num_vals_t_ins);
 h_ch = linspace(h_ch_start, h_ch_end, num_vals_h_ch);
 
+%convert to inches
+h_ch = h_ch/0.0254; % in
+w_ch_min = w_ch_min/0.0254; % in
+t_ins = t_ins/0.0254; % in
+w_rib = w_rib/0.0254; % in
 
 
 % determine number of cases
@@ -49,7 +75,8 @@ for i = 1:numel(w_ch_min)
                 current_t_ins = t_ins(k);
                 current_h_ch = h_ch(l);
                 % call the main function
-                [v_m_stress, Yield_iw, T_chg] = main(current_w_ch_min, current_w_rib, current_t_ins, current_h_ch);
+                [v_m_stress, Yield_iw, T_chg] = main_function(current_w_ch_min, current_w_rib, current_t_ins, current_h_ch, Pc,Pe,O_F, T_inlet,res,Thrust,C_star_eff,C_F_eff,L_star,t_out,ratio,AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, k_g, T_thr, Pr_g);
+
                 
                 % determine the relevant values
                 max_v_m_stress = max(v_m_stress);
@@ -62,8 +89,8 @@ for i = 1:numel(w_ch_min)
                 results{case_index, 2} = current_w_rib;
                 results{case_index, 3} = current_t_ins;
                 results{case_index, 4} = current_h_ch;
-                results{case_index, 5} = max_v_m_stress;
-                results{case_index, 6} = min_Yield_iw;
+                results{case_index, 5} = max_v_m_stress/6.895e+6;
+                results{case_index, 6} = min_Yield_iw/6.895e+6;
                 results{case_index, 7} = max_T_chg;
                 results{case_index, 8} = fos;
                 
@@ -81,13 +108,13 @@ for i = 1:numel(w_ch_min)
 end
 
 % generate table
-resutls_table = cell2table(results, 'VariableNames', {'w_ch_min (m)', 'w_rib (m)', 't_ins (m)', 'h_ch (m)', 'v_m_stress (pa)', 'Yield_iw (pa)', 'T_chg (k)', 'FOS'});
+resutls_table = cell2table(results, 'VariableNames', {'w_ch_min (in)', 'w_rib (in)', 't_ins (in)', 'h_ch (in)', 'v_m_stress (ksi)', 'Yield_iw (ksi)', 'T_chg (k)', 'FOS'});
 
 % print the case with the highest FOS
 if best_case ~= -1
-    bestCase = resutls_table(best_case, :);
+    best_case_table = resutls_table(best_case, :);
     fprintf('Case with highest FOS:\n');
-    disp(bestCase);
+    disp(best_case_table);
 else
     fprintf('No cases found.\n');
 end
