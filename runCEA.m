@@ -1,7 +1,7 @@
 % Output: area ratio, C*, thrust coefficient, gamma, gas molecular weight, 
 % gas specific heat, gas dynamic viscosity, near-side chamber wall gas 
 % temperature, prandtl number
-function [AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, T_cns, Pr_g] = runCEA(Pc, Pe, OF, eth_frac)
+function [AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, k_g, T_cns, Pr_g] = runCEA(Pc, Pe, OF, eth_frac)
     % CEA reactant parameters
     reactants = [CEA.Reactant('C2H5OH(L)',                  ...
                               'Type','Fuel',                ...
@@ -43,7 +43,7 @@ function [AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, T_cns, Pr_g] = runCEA(Pc, Pe
                        'supar', AR,             ...
                        'Outputs', {'gamma'});
 
-        gamma  = [data.gamma(1), data.gamma(2), data.gamma(3)];    
+        gamma  = [data.gamma(1), data.gamma(1), data.gamma(2), data.gamma(3)];    
     end
     
     data = CEA.Run(reactants,               ...
@@ -56,11 +56,13 @@ function [AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, T_cns, Pr_g] = runCEA(Pc, Pe
 
     % Data output
     C_star = data.isp(3).Value * 9.80665 / data.cf(3);
-    C_F    = [data.cf(1), data.cf(2), data.cf(3)];
-    MW_g   = [data.MolarMass(1).Value, data.MolarMass(2).Value, data.MolarMass(3).Value];
-    Cp_g   = [data.cp(1).Value, data.cp(2).Value, data.cp(3).Value];
-    mu_g   = [data.vis(1), data.vis(2), data.vis(3)];
-    T_cns  = [data.Temperature(1).Value, data.Temperature(2).Value, data.Temperature(3).Value];  
+    % C_F    = [data.cf(1), data.cf(2), data.cf(3)];
+    C_F = data.cf(3);
+    MW_g   = [data.MolarMass(1).Value, data.MolarMass(1).Value, data.MolarMass(2).Value, data.MolarMass(3).Value];
+    Cp_g   = [data.cp(1).Value, data.cp(1).Value, data.cp(2).Value, data.cp(3).Value];
+    mu_g   = [data.vis(1).Value, data.vis(1).Value, data.vis(2).Value, data.vis(3).Value];
+    k_g = [data.cond(1).Value, data.cond(1).Value, data.cond(2).Value, data.cond(3).Value];
+    % T_cns  = [data.Temperature(1).Value, data.Temperature(2).Value, data.Temperature(3).Value];  
     T_cns = data.Temperature(2).Value;
-    Pr_g   = [data.pran(1), data.pran(2), data.pran(3)];
+    Pr_g   = [data.pran(1), data.pran(1), data.pran(2), data.pran(3)];
 end
