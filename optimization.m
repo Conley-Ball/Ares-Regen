@@ -2,26 +2,26 @@ clear all; close all; clc;
 
 % start values (don't decrease below min values)
 w_ch_min_start = 0.000635; % 0.000635 min
-w_rib_start = 0.000381; % 0.000381 min
+w_rib_start = 0.0005; % 0.000381 min
 t_ins_start = 0.00042; % 0.00042 min
 h_ch_start = 0.000635; % 0.000635 min
 
 % end values
-w_ch_min_end = 0.000636;
-w_rib_end = 0.000382;
-t_ins_end = 0.00043;
-h_ch_end = 0.000635;
+w_ch_min_end = 0.000635;
+w_rib_end = 0.0007;
+t_ins_end = 0.00042;
+h_ch_end = 0.0007;
 
 % number of values for each parameter
-num_vals_w_ch_min = 2;
-num_vals_w_rib = 2;
-num_vals_t_ins = 2;
-num_vals_h_ch = 1;
+num_vals_w_ch_min = 1;
+num_vals_w_rib = 3;
+num_vals_t_ins = 1;
+num_vals_h_ch = 2;
 
 %CEA Inputs
-Pc = 413; % psia
+Pc = 363.7; % psia
 Pe = 13.7; % psia
-O_F = 1.1;
+O_F = 1;
 T_inlet = 300; % K
 
 res = 0; % thermal resistance coating
@@ -33,12 +33,12 @@ L_star = 28; % in
 
 t_out = 0.001/0.0254; % in
 
-ratio = 0.75;
+ratio = 0.95;
 
 %% CEA Function
 
 [AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, k_g, T_thr, Pr_g] = runCEA(Pc, Pe, O_F, ratio);
-T_thr = T_thr*C_star_eff;
+T_thr = T_thr*C_star_eff^2;
 
 %%
 % generate values
@@ -85,10 +85,10 @@ for i = 1:numel(w_ch_min)
                 % determine fos
                 fos = min_Yield_iw / max_v_m_stress;
                 % store results
-                results{case_index, 1} = current_w_ch_min;
-                results{case_index, 2} = current_w_rib;
-                results{case_index, 3} = current_t_ins;
-                results{case_index, 4} = current_h_ch;
+                results{case_index, 1} = current_w_ch_min*0.0254;
+                results{case_index, 2} = current_w_rib*0.0254;
+                results{case_index, 3} = current_t_ins*0.0254;
+                results{case_index, 4} = current_h_ch*0.0254;
                 results{case_index, 5} = max_v_m_stress/6.895e+6;
                 results{case_index, 6} = min_Yield_iw/6.895e+6;
                 results{case_index, 7} = max_T_chg;
@@ -108,7 +108,7 @@ for i = 1:numel(w_ch_min)
 end
 
 % generate table
-resutls_table = cell2table(results, 'VariableNames', {'w_ch_min (in)', 'w_rib (in)', 't_ins (in)', 'h_ch (in)', 'v_m_stress (ksi)', 'Yield_iw (ksi)', 'T_chg (k)', 'FOS'});
+resutls_table = cell2table(results, 'VariableNames', {'w_ch_min (m)', 'w_rib (m)', 't_ins (m)', 'h_ch (m)', 'v_m_stress (ksi)', 'Yield_iw (ksi)', 'T_chg (k)', 'FOS'});
 
 % print the case with the highest FOS
 if best_case ~= -1
