@@ -3,9 +3,9 @@ clc; clear; close all;
 %% Inputs
 
 % CEA Inputs
-Pc = 413; % psia
+Pc = 313; % psia
 Pe = 13.7; % psia
-O_F = 1.1;
+O_F = 1.0;
 T_inlet = 300; % K
 
 res = 0; % thermal resistance coating
@@ -14,11 +14,13 @@ Thrust = 1600; % lbf
 C_star_eff = 0.94;
 C_F_eff = 0.9;
 L_star = 28; % in
-h_ch = 0.000635/0.0254; % in
-w_ch_min = 0.000635/0.0254; % in
-%num_ch = 50;
-w_rib = 0.000381/0.0254; % in
 D_c = 3.875; % in
+h_ch_th = 0.0006/0.0254; % in
+h_ch_c = 1.5*h_ch_th; % in
+h_ch_e = 1.5*h_ch_th; % in
+w_ch_min = 0.0006/0.0254; % in
+w_rib = 0.001/0.0254; % in
+
 t_ins = 0.00042/0.0254; % in
 t_out = 0.001/0.0254; % in
 
@@ -45,7 +47,7 @@ T_thr = T_thr*C_star_eff^2;
 
 num_nodes = 300;
 angle_conv = 40;
-[A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes);
+[A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch_th,h_ch_c,h_ch_e,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes);
 mdot_f = mdot*1/(1+O_F); %kg/s
 
 % D_t = D_t*0.0254; % m

@@ -2,7 +2,7 @@ function [v_m_stress] = stress_new(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,E
 
 for i = 1:length(pos)
 q = P_c(i) - P(i);
-r0 = D(i)/2+t_ins+h_ch+t_out; 
+r0 = D(i)/2+t_ins+h_ch(i)+t_out; 
 ri = D(i)/2;
 r_bar = (r0+ri)/2;
 
@@ -24,7 +24,7 @@ sigma_total_shear(i) = sigma_s_i(i)+sigma_s_r(i);
 
 % axial stress was taken from Adams definiton and is not from any paper
 if pos(i)>l_div
-    sigma_a(i) = ((P(end)*pi.*(D(i)^2/4-D_t^2/4))./ (pi .* ((D(i)/2+t_ins+h_ch+t_out)^2 - D(i)^2/4) - (num_ch .* h_ch .* w_ch(i)) ));
+    sigma_a(i) = ((P(end)*pi.*(D(i)^2/4-D_t^2/4))./ (pi .* ((D(i)/2+t_ins+h_ch(i)+t_out)^2 - D(i)^2/4) - (num_ch .* h_ch(i) .* w_ch(i)) ));
 else
     sigma_a(i) = 0;
 end

@@ -20,7 +20,6 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct]
     T_rhg = zeros(1,length(pos));
     q = zeros(1,length(pos));
 
-    h_ch = h_ch*ones(1,length(w_ch));
     step = [step 1];
 
     T_c(1) = T_inlet;

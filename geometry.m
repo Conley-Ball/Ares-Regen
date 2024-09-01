@@ -1,5 +1,5 @@
 %Rocket Project Ares 2024-2025
-function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes)
+function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch_th,h_ch_c,h_ch_e,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes)
 
 
     %% Geometry inputs
@@ -11,7 +11,9 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     Pe = Pe*6894.76; % pa
     t_ins = t_ins*0.0254; % m
     t_out = t_out*0.0254; % m
-    h_ch = h_ch*0.0254; % m
+    h_ch_th = h_ch_th*0.0254; % m
+    h_ch_c = h_ch_c*0.0254; % m
+    h_ch_e = h_ch_e*0.0254; % m
     w_rib=w_rib*0.0254; % m
     w_ch_min=w_ch_min*0.0254; % m
     L_star=L_star*0.0254; % m
@@ -184,8 +186,11 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     num_ch = floor(circ_t/(w_rib+w_ch_min));
     %actual channel width can be found now based on the number of channels
     w_ch = circ/num_ch-w_rib;
+
+    h_ch = [linspace(h_ch_e,h_ch_th,length(x_div)) linspace(h_ch_th,h_ch_c,length(x_conv)) h_ch_c*ones(1,length(xc))];
+
     %hydraulic diameter definition
-    D_h = 4*h_ch*w_ch./(2*h_ch+2*w_ch);
+    D_h = 4*h_ch.*w_ch./(2*h_ch+2*w_ch);
     
     %% Flow calcs
     
