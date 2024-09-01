@@ -28,7 +28,7 @@ ratio = 0.75;
 % CEA Function
 
 [AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, k_g, T_thr, Pr_g] = runCEA(Pc, Pe, O_F, ratio);
-T_thr = T_thr*C_star_eff;
+T_thr = T_thr*C_star_eff^2;
 
 % CEA Outputs
 % MW_g = [21.834   21.836   21.929   22.040];
