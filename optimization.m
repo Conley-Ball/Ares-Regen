@@ -1,27 +1,27 @@
 clear all; close all; clc;
 
 % Start and end values
-w_ch_min_start = 0.001; % meters
-w_rib_start = 0.001; % meters
-t_ins_start = 0.001; % meters
-h_ch_th_start = 0.001; % meters
-h_ch_c_start = 0.001; % meters
-h_ch_e_start = 0.001; % meters
+w_ch_min_start = 0.001; % m
+w_rib_start = 0.001; % m
+t_ins_start = 0.001; % m
+h_ch_th_start = 0.001; % m
+h_ch_c_start = 0.001; % m
+h_ch_e_start = 0.001; % m
 
-h_ch_th_end = 0.001; % meters
-h_ch_c_end = 0.001; % meters
-h_ch_e_end = 0.001; % meters
-w_ch_min_end = 0.001; % meters
-w_rib_end = 0.001; % meters
-t_ins_end = 0.001; % meters
+h_ch_th_end = 0.001; % m
+h_ch_c_end = 0.0011; % m
+h_ch_e_end = 0.0011; % m
+w_ch_min_end = 0.001; % m
+w_rib_end = 0.001; % m
+t_ins_end = 0.001; % m
 
 % Number of values
 num_vals_w_ch_min = 1;
 num_vals_w_rib = 1;
 num_vals_t_ins = 1;
 num_vals_h_ch_th = 1;
-num_vals_h_ch_c = 1;
-num_vals_h_ch_e = 1;
+num_vals_h_ch_c = 2;
+num_vals_h_ch_e = 2;
 
 % CEA Inputs
 Pc = 413.7; % psia
@@ -33,8 +33,7 @@ Thrust = 2000; % lbf
 C_star_eff = 0.94;
 C_F_eff = 0.99;
 L_star = 30; % in
-t_out = 0.001 / 0.0254; % inches
-
+t_out = 0.001 / 0.0254; % in
 ratio = 0.75;
 %%
 % CEA Function
@@ -49,17 +48,17 @@ h_ch_th = linspace(h_ch_th_start, h_ch_th_end, num_vals_h_ch_th);
 h_ch_c = linspace(h_ch_c_start, h_ch_c_end, num_vals_h_ch_c);
 h_ch_e = linspace(h_ch_e_start, h_ch_e_end, num_vals_h_ch_e);
 
-% Convert to inches if needed (assuming you still need this conversion)
-h_ch_th = h_ch_th / 0.0254; % inches
-h_ch_c = h_ch_c / 0.0254; % inches
-h_ch_e = h_ch_e / 0.0254; % inches
-w_ch_min = w_ch_min / 0.0254; % inches
-t_ins = t_ins / 0.0254; % inches
-w_rib = w_rib / 0.0254; % inches
+% Convert to inches
+h_ch_th = h_ch_th / 0.0254; % in
+h_ch_c = h_ch_c / 0.0254; % in
+h_ch_e = h_ch_e / 0.0254; % in
+w_ch_min = w_ch_min / 0.0254; % in
+t_ins = t_ins / 0.0254; % in
+w_rib = w_rib / 0.0254; % in
 
 % Determine number of cases
 num_cases = numel(w_ch_min) * numel(w_rib) * numel(t_ins) * numel(h_ch_th) * numel(h_ch_c) * numel(h_ch_e);
-results = cell(num_cases, 9);  % Update the number of columns
+
 
 % Initialize variables to track FOS
 max_fos = 0;
