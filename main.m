@@ -3,12 +3,14 @@ clc; clear; close all;
 %% Inputs
 
 % CEA Inputs
-Pc = 313; % psia
+Pc = 413; % psia
 Pe = 13.7; % psia
 O_F = 1.0;
 T_inlet = 300; % K
 
-res = 0; % thermal resistance coating
+
+res = 0.0005/20; % thermal resistance coating t/k
+res = 0;
 Thrust = 1600; % lbf
 %Pe = 13; % psi 
 C_star_eff = 0.94;
@@ -16,13 +18,13 @@ C_F_eff = 0.9;
 L_star = 28; % in
 D_c = 3.875; % in
 h_ch_th = 0.0006/0.0254; % in
-h_ch_c = 1.5*h_ch_th; % in
-h_ch_e = 1.5*h_ch_th; % in
-w_ch_min = 0.0006/0.0254; % in
-w_rib = 0.001/0.0254; % in
+h_ch_c = 1*h_ch_th; % in
+h_ch_e = 1*h_ch_th; % in
+w_ch_min = 0.000635/0.0254; % in
+w_rib = 0.000635/0.0254; % in
 
-t_ins = 0.00042/0.0254; % in
-t_out = 0.001/0.0254; % in
+t_ins = 0.000325/0.0254; % in
+t_out = 0.005/0.0254; % in
 
 
 ratio = 0.75;
@@ -127,14 +129,15 @@ clf
 hold on
 xline(pos(id_th), '--', 'Throat','HandleVisibility','off')
 xline(pos(id_c), '--', 'Chamber','HandleVisibility','off')
-plot(pos,T_chg,'LineWidth',1)
-plot(pos,T_rhg,'LineWidth',1)
+% plot(pos,T_chg,'LineWidth',1)
+plot(pos,T_ci,'LineWidth',1)
+plot(pos,T_co,'LineWidth',1)
 xline(0, '--', 'Exit','HandleVisibility','off')
 hold off
 title('Hot Wall Temperature')
 xlabel('Axial Distance (m)')
 ylabel('Temperature (K)')
-legend('Coolant Section','Rib Section')
+legend('T_{ci}','T_{co}')
 grid on
 
 figure(6)

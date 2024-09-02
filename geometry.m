@@ -187,7 +187,14 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     %actual channel width can be found now based on the number of channels
     w_ch = circ/num_ch-w_rib;
 
-    h_ch = [linspace(h_ch_e,h_ch_th,length(x_div)) linspace(h_ch_th,h_ch_c,length(x_conv)) h_ch_c*ones(1,length(xc))];
+    % h_ch = [linspace(h_ch_e,h_ch_th,length(x_div)) linspace(h_ch_th,h_ch_c,length(x_conv)) h_ch_c*ones(1,length(xc))];
+    % h_ch = 0.000635*(D-min(D)+1);
+    % plot(pos,h_ch)
+    % D(throat)/ratio=0.000635
+    ratio = D_t/0.000635;
+    h_ch = D/ratio;
+    % h_ch(1:length(x_div)) = 0.000635;
+    plot(pos,h_ch)
 
     %hydraulic diameter definition
     D_h = 4*h_ch.*w_ch./(2*h_ch+2*w_ch);

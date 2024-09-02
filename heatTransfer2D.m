@@ -91,7 +91,7 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct]
                 
                 T_aw = T(i)*((1+r*(gamma(i)-1)/2*M(i)^2)/(1+(gamma(i)-1)/2*M(i)^2)); % K
     
-                eq = @(T_w) solveFunction(T_w,w,b,t,t_r,l,epsilon,eta,T_aw,M(i),T(i),A(i),gamma(i),Cp_g(i),mu_g(i),Pr_g(i),Pc,C_star,C_star_eff,D_t,R,A_t,res,h_c(i),T_c(i),kT_chg,kT_rhg,kT_ci,kT_ri);
+                eq = @(T_w) solveFunction(T_w,w,b,t,t_r,l,epsilon,eta,T_aw,M(i),T(i),A(i),gamma(i),Cp_g,mu_g,Pr_g,Pc,C_star,C_star_eff,D_t,R,A_t,res,h_c(i),T_c(i),kT_chg,kT_rhg,kT_ci,kT_ri);
                 
                 if i > 1
                     sol = fsolve(eq,[T_chg(i-1),T_rhg(i-1)],optimset('Display', 'off', 'TolX',1e-4));
@@ -107,8 +107,8 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct]
                 sigma_c = ( (0.5*(T_chg(i)/T(i))*(1+(gamma(i)-1)/2*M(i)^2)+0.5)^0.68*(1+(gamma(i)-1)/2*M(i)^2)^0.12 )^-1; % []
                 sigma_r = ( (0.5*(T_rhg(i)/T(i))*(1+(gamma(i)-1)/2*M(i)^2)+0.5)^0.68*(1+(gamma(i)-1)/2*M(i)^2)^0.12 )^-1; % []
                 
-                h_chg(i) = (0.026/(D_t^0.2))*(mu_g(i)^0.2*Cp_g(i)*Pr_g(i)^-0.6)*(Pc/(C_star*C_star_eff))^0.8*(D_t/R)^0.1*(A_t/A(i))^0.9*sigma_c; % [W/m^2-K]
-                h_rhg(i) = (0.026/(D_t^0.2))*(mu_g(i)^0.2*Cp_g(i)*Pr_g(i)^-0.6)*(Pc/(C_star*C_star_eff))^0.8*(D_t/R)^0.1*(A_t/A(i))^0.9*sigma_r; % [W/m^2-K]
+                h_chg(i) = (0.026/(D_t^0.2))*(mu_g(end)^0.2*Cp_g(end)*Pr_g(end)^-0.6)*(Pc/(C_star*C_star_eff))^0.8*(D_t/R)^0.1*(A_t/A(i))^0.9*sigma_c; % [W/m^2-K]
+                h_rhg(i) = (0.026/(D_t^0.2))*(mu_g(end)^0.2*Cp_g(end)*Pr_g(end)^-0.6)*(Pc/(C_star*C_star_eff))^0.8*(D_t/R)^0.1*(A_t/A(i))^0.9*sigma_r; % [W/m^2-K]
                 
                 T_ci(i) = T_chg(i)-h_chg(i)*t_r/kT_chg*(T_aw-T_chg(i)); % K
                 T_ri(i) = T_rhg(i)-h_rhg(i)*t_r/kT_rhg*(T_aw-T_rhg(i)); % K
@@ -130,8 +130,10 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct]
 
             end
 
-            Q_chg = b*(T_aw-T_chg(i))/(1/h_chg(i)+res); % W/m
-            Q_rhg = w*(T_aw-T_rhg(i))/(1/h_rhg(i)+res); % W/m
+            % Q_chg = b*(T_aw-T_chg(i))/(1/h_chg(i)+res); % W/m
+            % Q_rhg = w*(T_aw-T_rhg(i))/(1/h_rhg(i)+res); % W/m
+            Q_chg = (T_aw-T_chg(i))/(1/(b*h_chg(i))+res/b); % W/m
+            Q_rhg = (T_aw-T_rhg(i))/(1/(w*h_rhg(i))+res/w); % W/m
             
             Q_tot = Q_chg + Q_rhg; % W/m
             q(i) = Q_tot/(b+w); % W/m^2
