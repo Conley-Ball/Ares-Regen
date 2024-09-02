@@ -162,7 +162,6 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     yc = yc(2:end);
     
     %% Full Geometry
-    
     %the positon of the nodes is an array of all sections combined together.
     %Sections are adjusted to line up, flip is used to reverse position
     %definition so that pos starts at zero, and *-1 is used to flip positon so
@@ -173,7 +172,18 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     D = 2*r; %m
     A = pi*r.^2; %m
     %step is distance between nodes
-    step=diff(pos);
+    step = diff(pos);
+    step_h = diff(r);
+ % channel high is only measured radially, but in reality we want to define the hight normal to the inner wall
+ % initialize theta array to store results
+     theta = zeros(1, length(step));
+ % compute the angle between each step
+     for i = 1:length(step)
+     theta(i) = atan(step_h(i) / step(i));
+     end
+   % add the last point to the chamber so the arrays are the same size
+    theta = cat(2,theta,theta(end));
+   % define h_ch/cos(theta)
     
     %% Channels
     
@@ -187,17 +197,20 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     %actual channel width can be found now based on the number of channels
     w_ch = circ/num_ch-w_rib;
 
-    % h_ch = [linspace(h_ch_e,h_ch_th,length(x_div)) linspace(h_ch_th,h_ch_c,length(x_conv)) h_ch_c*ones(1,length(xc))];
-    % h_ch = 0.000635*(D-min(D)+1);
-    % plot(pos,h_ch)
-    % D(throat)/ratio=0.000635
-    ratio = D_t/0.000635;
-    h_ch = D/ratio;
+    x = [linspace(0,x_div(end),100) linspace(x_conv(1),x_conv(end),100) linspace(xc(1),xc(end),100)];
+    h_ch = [linspace(h_ch_e,h_ch_th,100) linspace(h_ch_th,h_ch_c,100) linspace(h_ch_c,h_ch_c,100)];
+
+    h_ch = interp1(x,h_ch,pos);%./cos(theta);
+
+    D_h = 4*h_ch.*w_ch./(2*h_ch+2*w_ch);
+
+    % ratio = D_t/h_ch_th;
+    % h_ch = D/ratio;
+
     % h_ch(1:length(x_div)) = 0.000635;
-    plot(pos,h_ch)
+    % plot(pos,h_ch)
 
     %hydraulic diameter definition
-    D_h = 4*h_ch.*w_ch./(2*h_ch+2*w_ch);
     
     %% Flow calcs
     
@@ -211,13 +224,19 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     id_c = pos_div+pos_conv;
 
     %gamma is combined
-    MW_g = [linspace(MW_g(4),MW_g(3), pos_div),linspace(MW_g(3),MW_g(2),pos_conv),linspace(MW_g(2),MW_g(1),pos_c)];
-    gamma = [linspace(gamma(4),gamma(3), pos_div),linspace(gamma(3),gamma(2),pos_conv),linspace(gamma(2),gamma(1),pos_c)];
-    mu_g = [linspace(mu_g(4),mu_g(3), pos_div),linspace(mu_g(3),mu_g(2),pos_conv),linspace(mu_g(2),mu_g(1),pos_c)];
-    Cp_g = [linspace(Cp_g(4),Cp_g(3), pos_div),linspace(Cp_g(3),Cp_g(2),pos_conv),linspace(Cp_g(2),Cp_g(1),pos_c)];
-    k_g = [linspace(k_g(4),k_g(3), pos_div),linspace(k_g(3),k_g(2),pos_conv),linspace(k_g(2),k_g(1),pos_c)];
-    Pr_g = [linspace(Pr_g(4),Pr_g(3), pos_div),linspace(Pr_g(3),Pr_g(2),pos_conv),linspace(Pr_g(2),Pr_g(1),pos_c)];
+    MW_g = [linspace(MW_g(4),MW_g(3), 100),linspace(MW_g(3),MW_g(2),100),linspace(MW_g(2),MW_g(1),100)];
+    gamma = [linspace(gamma(4),gamma(3), 100),linspace(gamma(3),gamma(2),100),linspace(gamma(2),gamma(1),100)];
+    mu_g = [linspace(mu_g(4),mu_g(3), 100),linspace(mu_g(3),mu_g(2),100),linspace(mu_g(2),mu_g(1),100)];
+    Cp_g = [linspace(Cp_g(4),Cp_g(3), 100),linspace(Cp_g(3),Cp_g(2),100),linspace(Cp_g(2),Cp_g(1),100)];
+    k_g = [linspace(k_g(4),k_g(3), 100),linspace(k_g(3),k_g(2),100),linspace(k_g(2),k_g(1),100)];
+    Pr_g = [linspace(Pr_g(4),Pr_g(3), 100),linspace(Pr_g(3),Pr_g(2),100),linspace(Pr_g(2),Pr_g(1),100)];
 
+    MW_g = interp1(x,MW_g,pos);
+    gamma = interp1(x,gamma,pos);
+    mu_g = interp1(x,mu_g,pos);
+    Cp_g = interp1(x,Cp_g,pos);
+    k_g = interp1(x,k_g,pos);
+    Pr_g = interp1(x,Pr_g,pos);
     
     %A is seperated into subsonic and supersonic ssections
     A_sup = A(1:pos_div); %m^2

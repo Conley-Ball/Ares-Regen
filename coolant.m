@@ -1,4 +1,4 @@
-function [rho_c,mu_c,k_c,Cp_c,T_sat_c,v_c] = coolant(T_c,P_c,ratio,mdot_f,l_ch,w_ch,num)   
+function [rho_c,T_sat_c,mu_c,k_c,Cp_c,v_c] = coolant(T_c,P_c,ratio,mdot_f,w_ch,h_ch,num)   
         rho_water = py.CoolProp.CoolProp.PropsSI('D','T', T_c, 'P', P_c, 'water');
         mu_water = py.CoolProp.CoolProp.PropsSI('V','T', T_c, 'P', P_c, 'water');
         k_water = py.CoolProp.CoolProp.PropsSI('L','T', T_c, 'P', P_c, 'water');
@@ -16,7 +16,7 @@ function [rho_c,mu_c,k_c,Cp_c,T_sat_c,v_c] = coolant(T_c,P_c,ratio,mdot_f,l_ch,w
         k_c = k_water*(1-ratio)+k_ethanol*ratio;
         Cp_c = Cp_water*(1-ratio)+Cp_ethanol*ratio;
         T_sat_c = T_sat_water*(1-ratio)+T_sat_ethanol*ratio;
-        v_c = mdot_f/(l_ch*w_ch*num*rho_c);
+        v_c = mdot_f/((w_ch*h_ch)*num*rho_c);
 
 
 end

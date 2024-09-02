@@ -5,26 +5,26 @@ clc; clear; close all;
 % CEA Inputs
 Pc = 413; % psia
 Pe = 13.7; % psia
-O_F = 1.0;
+O_F = 0.8;
 T_inlet = 300; % K
 
 
-res = 0.0005/20; % thermal resistance coating t/k
+% res = 0.00005/20; % thermal resistance coating t/k
 res = 0;
-Thrust = 1600; % lbf
-%Pe = 13; % psi 
+Thrust = 2000; % lbf
 C_star_eff = 0.94;
-C_F_eff = 0.9;
-L_star = 28; % in
-D_c = 3.875; % in
-h_ch_th = 0.0006/0.0254; % in
-h_ch_c = 1*h_ch_th; % in
-h_ch_e = 1*h_ch_th; % in
-w_ch_min = 0.000635/0.0254; % in
-w_rib = 0.000635/0.0254; % in
+C_F_eff = 0.99;
+L_star = 30; % in
+h_ch_th = 0.001/0.0254; % in
+% h_ch_c = 1.5*h_ch_th; % in
+% h_ch_e = 1.5*h_ch_th; % in
+h_ch_c = 0.001/0.0254; % in
+h_ch_e = 0.001/0.0254; % in
+w_ch_min = 0.001/0.0254; % in
+w_rib = 0.001/0.0254; % in
 
-t_ins = 0.000325/0.0254; % in
-t_out = 0.005/0.0254; % in
+t_ins = 0.001/0.0254; % in
+t_out = 0.001/0.0254; % in
 
 
 ratio = 0.75;
@@ -55,15 +55,15 @@ mdot_f = mdot*1/(1+O_F); %kg/s
 % D_t = D_t*0.0254; % m
 % A_t = A_t*0.0254^2; % m^2
 tic
-[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res);
+[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res);
 toc
 
 % ===STRESS===
 % Temperature Dependent Material properties
 % Inner Wall
-[row_iw,E_iw,nu_iw,alpha_iw,k_iw,Cp_iw,Yield_iw] = MatProperties_Steel174ph(T_ci);
+[row_iw,E_iw,nu_iw,alpha_iw,k_iw,Cp_iw,Yield_iw] = MatProperties_AlSi10Mg(T_ci);
 % Outer Wall
-[row_ow,E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = MatProperties_Steel174ph(T_co);
+[row_ow,E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = MatProperties_AlSi10Mg(T_co);
 
 % Stress function call
 [v_m_stress] = stress_new(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,E_iw,nu_iw,h_ch,T_ci,T_co,D_t,num_ch,l_div);
@@ -129,18 +129,36 @@ clf
 hold on
 xline(pos(id_th), '--', 'Throat','HandleVisibility','off')
 xline(pos(id_c), '--', 'Chamber','HandleVisibility','off')
-% plot(pos,T_chg,'LineWidth',1)
+plot(pos,T_chg,'LineWidth',1)
+plot(pos,T_cb,'LineWidth',1)
 plot(pos,T_ci,'LineWidth',1)
+plot(pos,T_ct,'LineWidth',1)
 plot(pos,T_co,'LineWidth',1)
 xline(0, '--', 'Exit','HandleVisibility','off')
 hold off
 title('Hot Wall Temperature')
 xlabel('Axial Distance (m)')
 ylabel('Temperature (K)')
-legend('T_{ci}','T_{co}')
+legend('T_{w}','T_{cb}','T_{ci}','T_{ct}','T_{co}')
 grid on
 
 figure(6)
+clf
+hold on
+xline(pos(id_th), '--', 'Throat','HandleVisibility','off')
+xline(pos(id_c), '--', 'Chamber','HandleVisibility','off')
+% plot(pos,T_chg,'LineWidth',1)
+plot(pos,h_chg,'LineWidth',1)
+plot(pos,h_rhg,'LineWidth',1)
+xline(0, '--', 'Exit','HandleVisibility','off')
+hold off
+title('Heat Transfer Coefficients')
+xlabel('Axial Distance (m)')
+ylabel('heat')
+legend('h_{chg}','h_{rhg}')
+grid on
+
+figure(7)
 clf
 hold on
 xline(pos(id_th), '--', 'Throat','HandleVisibility','off')

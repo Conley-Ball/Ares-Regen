@@ -1,4 +1,4 @@
-function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res)
+function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res)
     T_c = zeros(1,length(pos));
     P_c = zeros(1,length(pos));
 
@@ -24,16 +24,16 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct]
 
     T_c(1) = T_inlet;
     pgs = 0;
-    P_c_inj = -Pc;
+    P_c_inj = -0.2*Pc;
     tol = 6894.76;
     
-    while abs(P_c_inj-Pc) > tol
+    while abs(P_c_inj-(1.2*Pc)) > tol
         P_c_prev = P_c(1);
         P_c = zeros(1,length(pos));
-        P_c(1) = P_c_prev+Pc-P_c_inj;
+        P_c(1) = P_c_prev+1.2*Pc-P_c_inj;
         for i=1:length(pos)
             %% Coolant Properties
-            [rho_c,mu_c,k_c,Cp_c,T_sat_c(i),v_c] = coolant(T_c(i),P_c(i),ratio,mdot_f,w_ch(i),h_ch(i),num);
+            [rho_c,T_sat_c(i),mu_c,k_c,Cp_c,v_c] = coolant(T_c(i),P_c(i),ratio,mdot_f,w_ch(i),h_ch(i),num);
             
             %% Coolant Side Heat Transfer
     
@@ -43,8 +43,8 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct]
 
             h_c(i) = Nu_c*k_c/D_h(i); % [W/m^2-K];
             if T_sat_c(i) < T_c(i)
-                warning('Coolant is boiling. This may cause an error. Proceed?')
-                pause
+                % warning('Coolant is boiling. This may cause an error. Proceed?')
+                % pause
             end
             
             %% Gas Side Heat Transfer
@@ -63,21 +63,21 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct]
             % Conductivity
 
             if i > 1
-                kT_chg = kSteel174ph(T_chg(i-1));
-                kT_rhg = kSteel174ph(T_rhg(i-1));
-                kT_ci = kSteel174ph(T_ci(i-1));
-                kT_ri = kSteel174ph(T_ri(i-1));
-                kT_cb = kSteel174ph(T_cb(i-1));
-                kT_rb = kSteel174ph(T_rb(i-1));
-                kT_rt = kSteel174ph(T_rt(i-1));
+                kT_chg = kAL(T_chg(i-1))*1.5;
+                kT_rhg = kAL(T_rhg(i-1))*1.5;
+                kT_ci = kAL(T_ci(i-1))*1.5;
+                kT_ri = kAL(T_ri(i-1))*1.5;
+                kT_cb = kAL(T_cb(i-1))*1.5;
+                kT_rb = kAL(T_rb(i-1))*1.5;
+                kT_rt = kAL(T_rt(i-1))*1.5;
             else
-                kT_chg = kSteel174ph(300);
-                kT_rhg = kSteel174ph(300);
-                kT_ci = kSteel174ph(300);
-                kT_ri = kSteel174ph(300);
-                kT_cb = kSteel174ph(300);
-                kT_rb = kSteel174ph(300);
-                kT_rt = kSteel174ph(300);
+                kT_chg = kAL(300)*1.5;
+                kT_rhg = kAL(300)*1.5;
+                kT_ci = kAL(300)*1.5;
+                kT_ri = kAL(300)*1.5;
+                kT_cb = kAL(300)*1.5;
+                kT_rb = kAL(300)*1.5;
+                kT_rt = kAL(300)*1.5;
             end
             error = 300;
             while abs(error) > 1
@@ -120,13 +120,13 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct]
                 T_co(i) = T_ro(i) - H*w*l/(4*kT_rt*d)*(T_rt(i)-T_c(i)); % K
                 T_ct(i) = T_co(i) - H*w*d_r/(kT_rt*b)*(T_rt(i)-T_c(i)); % K
     
-                kT_chg = kSteel174ph(T_chg(i));
-                kT_rhg = kSteel174ph(T_rhg(i));
-                kT_ci = kSteel174ph(T_ci(i));
-                kT_ri = kSteel174ph(T_ri(i));
-                kT_cb = kSteel174ph(T_cb(i));
-                kT_rb = kSteel174ph(T_rb(i));
-                kT_rt = kSteel174ph(T_rt(i));
+                kT_chg = kAL(T_chg(i))*1.5;
+                kT_rhg = kAL(T_rhg(i))*1.5;
+                kT_ci = kAL(T_ci(i))*1.5;
+                kT_ri = kAL(T_ri(i))*1.5;
+                kT_cb = kAL(T_cb(i))*1.5;
+                kT_rb = kAL(T_rb(i))*1.5;
+                kT_rt = kAL(T_rt(i))*1.5;
 
             end
 
@@ -141,7 +141,7 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct]
                 error('Negative Heat Flux')
             end
     
-            epsilon_w = 2e-6; % m
+            epsilon_w = 2e-5; % m
             f = (-1.8*log10((epsilon_w/3.7/D_h(i))^1.11+6.9/Re_c))^-2; % []
             if i+1 <= length(pos)
                 if D_h(i+1) > D_h(i)
