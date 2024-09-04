@@ -1,4 +1,4 @@
-function [v_m_stress, Yield_iw, T_chg] = main_function(w_ch_min, w_rib, t_ins, h_ch_th, h_ch_c, h_ch_e, Pc, Pe, O_F, T_inlet, res, Thrust, C_star_eff, C_F_eff, L_star, t_out, ratio, AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, k_g, T_thr, Pr_g)
+function [v_m_stress, Yield_iw, T_chg, P_c] = main_function(w_ch_min, w_rib, t_ins, h_ch_th, h_ch_c, h_ch_e, Pc, Pe, O_F, T_inlet, res, Thrust, C_star_eff, C_F_eff, L_star, t_out, ratio, AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, k_g, T_thr, Pr_g)
 
 
 

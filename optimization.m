@@ -8,27 +8,27 @@ h_ch_th_start = 0.001; % m
 h_ch_c_start = 0.001; % m
 h_ch_e_start = 0.001; % m
 
-h_ch_th_end = 0.001; % m
-h_ch_c_end = 0.0011; % m
-h_ch_e_end = 0.0011; % m
-w_ch_min_end = 0.001; % m
-w_rib_end = 0.001; % m
-t_ins_end = 0.001; % m
+h_ch_th_end = 0.003; % m
+h_ch_c_end = 0.003; % m
+h_ch_e_end = 0.003; % m
+w_ch_min_end = 0.002; % m
+w_rib_end = 0.003; % m
+t_ins_end = 0.0035; % m
 
 % Number of values
-num_vals_w_ch_min = 1;
-num_vals_w_rib = 1;
-num_vals_t_ins = 1;
-num_vals_h_ch_th = 1;
-num_vals_h_ch_c = 2;
-num_vals_h_ch_e = 2;
+num_vals_w_ch_min = 3;
+num_vals_w_rib = 5;
+num_vals_t_ins = 5;
+num_vals_h_ch_th = 5;
+num_vals_h_ch_c = 5;
+num_vals_h_ch_e = 5;
 
 % CEA Inputs
-Pc = 413.7; % psia
+Pc = 313.7; % psia
 Pe = 13.7; % psia
-O_F = .8;
+O_F = .9;
 T_inlet = 300; % K
-res = 0; % thermal resistance coating
+res = 0.00005/1; % thermal resistance coating
 Thrust = 2000; % lbf
 C_star_eff = 0.94;
 C_F_eff = 0.99;
@@ -83,7 +83,7 @@ for i = 1:numel(w_ch_min)
                         current_h_ch_e = h_ch_e(n);
 
                         % Call the main function
-                        [v_m_stress, Yield_iw, T_chg] = main_function(current_w_ch_min, current_w_rib, current_t_ins, current_h_ch_th, current_h_ch_c, current_h_ch_e, Pc, Pe, O_F, T_inlet, res, Thrust, C_star_eff, C_F_eff, L_star, t_out, ratio, AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, k_g, T_thr, Pr_g);
+                        [v_m_stress, Yield_iw, T_chg, P_c] = main_function(current_w_ch_min, current_w_rib, current_t_ins, current_h_ch_th, current_h_ch_c, current_h_ch_e, Pc, Pe, O_F, T_inlet, res, Thrust, C_star_eff, C_F_eff, L_star, t_out, ratio, AR, C_star, C_F, gamma, MW_g, Cp_g, mu_g, k_g, T_thr, Pr_g);
 
                         % Determine relevant values
                         max_v_m_stress = max(v_m_stress);
@@ -104,9 +104,10 @@ for i = 1:numel(w_ch_min)
                         results{case_index, 8} = min_Yield_iw / 6.895e+6; % ksi
                         results{case_index, 9} = max_T_chg;
                         results{case_index, 10} = fos;
-
+                        dP = P_c(1)-P_c(end);
+                        results{case_index, 11} = dP;
                         % Check for highest FOS
-                        if fos > max_fos
+                        if fos > max_fos && dP <100
                             max_fos = fos;
                             best_case = case_index;
                         end
@@ -121,7 +122,7 @@ for i = 1:numel(w_ch_min)
 end
 
 % Generate table
-results_table = cell2table(results, 'VariableNames', {'w_ch_min_m', 'w_rib_m', 't_ins_m', 'h_ch_th_m', 'h_ch_c_m', 'h_ch_e_m', 'v_m_stress_ksi', 'Yield_iw_ksi', 'T_chg_K', 'FOS'});
+results_table = cell2table(results, 'VariableNames', {'w_ch_min_m', 'w_rib_m', 't_ins_m', 'h_ch_th_m', 'h_ch_c_m', 'h_ch_e_m', 'v_m_stress_ksi', 'Yield_iw_ksi', 'T_chg_K', 'FOS','dP'});
 
 % Print the case with the highest FOS
 if best_case ~= -1
