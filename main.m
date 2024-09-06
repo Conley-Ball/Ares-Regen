@@ -15,15 +15,11 @@ Thrust = 2000; % lbf
 C_star_eff = 0.94;
 C_F_eff = 0.99;
 L_star = 30; % in
-h_ch_th = 0.001/0.0254; % in
-% h_ch_c = 1.5*h_ch_th; % in
-% h_ch_e = 1.5*h_ch_th; % in
-h_ch_c = 0.0013/0.0254; % in
-h_ch_e = 0.00145/0.0254; % in
+h_ch = [0.0018 0.001 0.0013 0.0013]/0.0254;
 w_ch_min = 0.001/0.0254; % in
 w_rib = 0.001/0.0254; % in
 
-t_ins = 0.0017/0.0254; % in
+t_ins = [0.0018 0.0018 0.0018 0.0018]/0.0254; % in
 t_out = 0.001/0.0254; % in
 
 
@@ -49,7 +45,7 @@ T_thr = T_thr*C_star_eff^2;
 
 num_nodes = 300;
 angle_conv = 40;
-[A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch_th,h_ch_c,h_ch_e,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes);
+[A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes);
 mdot_f = mdot*1/(1+O_F); %kg/s
 
 % D_t = D_t*0.0254; % m

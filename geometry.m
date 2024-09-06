@@ -1,5 +1,5 @@
 %Rocket Project Ares 2024-2025
-function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch_th,h_ch_c,h_ch_e,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes)
+function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div] = geometry(Thrust,Pc,Pe,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,h_ch,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes)
 
 
     %% Geometry inputs
@@ -11,9 +11,7 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     Pe = Pe*6894.76; % pa
     t_ins = t_ins*0.0254; % m
     t_out = t_out*0.0254; % m
-    h_ch_th = h_ch_th*0.0254; % m
-    h_ch_c = h_ch_c*0.0254; % m
-    h_ch_e = h_ch_e*0.0254; % m
+    h_ch = h_ch*0.0254; % m
     w_rib=w_rib*0.0254; % m
     w_ch_min=w_ch_min*0.0254; % m
     L_star=L_star*0.0254; % m
@@ -189,6 +187,13 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     
     %% Channels
     
+    x = [linspace(0,x_div(end),100) linspace(x_conv(1),x_conv(end),100) linspace(xc(1),xc(end),100)];
+    h_ch = [linspace(h_ch(1),h_ch(2),100) linspace(h_ch(2),h_ch(3),100) linspace(h_ch(3),h_ch(4),100)];
+    t_ins = [linspace(t_ins(1),t_ins(2),100) linspace(t_ins(2),t_ins(3),100) linspace(t_ins(3),t_ins(4),100)];
+
+    h_ch = interp1(x,h_ch,pos);%./cos(theta);
+    t_ins = interp1(x,t_ins,pos);
+
     %circumference of the outer side of the inner wall is calculated
     circ = 2*pi*(r+t_ins);
     %throat circumference is calculated
@@ -199,10 +204,8 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     %actual channel width can be found now based on the number of channels
     w_ch = circ/num_ch-w_rib;
 
-    x = [linspace(0,x_div(end),100) linspace(x_conv(1),x_conv(end),100) linspace(xc(1),xc(end),100)];
-    h_ch = [linspace(h_ch_e,h_ch_th,100) linspace(h_ch_th,h_ch_c,100) linspace(h_ch_c,h_ch_c,100)];
-
-    h_ch = interp1(x,h_ch,pos);%./cos(theta);
+    % x = [linspace(0,x_div(end),100) linspace(x_conv(1),x_conv(end),100) linspace(xc(1),xc(floor(length(xc)/(2*pi))),100) linspace(xc(ceil(length(xc)/(2*pi))),xc(end),100)];
+    
 
     D_h = 4*h_ch.*w_ch./(2*h_ch+2*w_ch);
 
@@ -226,6 +229,7 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
     id_c = pos_div+pos_conv;
 
     %gamma is combined
+    x = [linspace(0,x_div(end),100) linspace(x_conv(1),x_conv(end),100) linspace(xc(1),xc(end),100)];
     MW_g = [linspace(MW_g(4),MW_g(3), 100),linspace(MW_g(3),MW_g(2),100),linspace(MW_g(2),MW_g(1),100)];
     gamma = [linspace(gamma(4),gamma(3), 100),linspace(gamma(3),gamma(2),100),linspace(gamma(2),gamma(1),100)];
     mu_g = [linspace(mu_g(4),mu_g(3), 100),linspace(mu_g(3),mu_g(2),100),linspace(mu_g(2),mu_g(1),100)];

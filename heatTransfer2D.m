@@ -53,7 +53,7 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
             w = w_rib; % m
             b = w_ch(i); % m
             h = h_ch(i); % m
-            t = t_ins; % m
+            t = t_ins(i); % m
             t_r = t/2; % m
             d = t_out; % m
             d_r = d/2; % m
@@ -63,21 +63,19 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
             % Conductivity
 
             if i > 1
-                kT_chg = kAL(T_chg(i-1))*1.5;
-                kT_rhg = kAL(T_rhg(i-1))*1.5;
-                kT_ci = kAL(T_ci(i-1))*1.5;
-                kT_ri = kAL(T_ri(i-1))*1.5;
-                kT_cb = kAL(T_cb(i-1))*1.5;
-                kT_rb = kAL(T_rb(i-1))*1.5;
-                kT_rt = kAL(T_rt(i-1))*1.5;
+                kT_chg = kAL(T_chg(i-1));
+                kT_rhg = kAL(T_rhg(i-1));
+                kT_ci = kAL(T_ci(i-1));
+                kT_ri = kAL(T_ri(i-1));
+                kT_rb = kAL(T_rb(i-1));
+                kT_rt = kAL(T_rt(i-1));
             else
-                kT_chg = kAL(300)*1.5;
-                kT_rhg = kAL(300)*1.5;
-                kT_ci = kAL(300)*1.5;
-                kT_ri = kAL(300)*1.5;
-                kT_cb = kAL(300)*1.5;
-                kT_rb = kAL(300)*1.5;
-                kT_rt = kAL(300)*1.5;
+                kT_chg = kAL(300);
+                kT_rhg = kAL(300);
+                kT_ci = kAL(300);
+                kT_ri = kAL(300);
+                kT_rb = kAL(300);
+                kT_rt = kAL(300);
             end
             error = 300;
             while abs(error) > 1
@@ -120,13 +118,12 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                 T_co(i) = T_ro(i) - H*w*l/(4*kT_rt*d)*(T_rt(i)-T_c(i)); % K
                 T_ct(i) = T_co(i) - H*w*d_r/(kT_rt*b)*(T_rt(i)-T_c(i)); % K
     
-                kT_chg = kAL(T_chg(i))*1.5;
-                kT_rhg = kAL(T_rhg(i))*1.5;
-                kT_ci = kAL(T_ci(i))*1.5;
-                kT_ri = kAL(T_ri(i))*1.5;
-                kT_cb = kAL(T_cb(i))*1.5;
-                kT_rb = kAL(T_rb(i))*1.5;
-                kT_rt = kAL(T_rt(i))*1.5;
+                kT_chg = kAL(T_chg(i));
+                kT_rhg = kAL(T_rhg(i));
+                kT_ci = kAL(T_ci(i));
+                kT_ri = kAL(T_ri(i));
+                kT_rb = kAL(T_rb(i));
+                kT_rt = kAL(T_rt(i));
 
             end
 

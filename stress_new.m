@@ -2,17 +2,17 @@ function [v_m_stress] = stress_new(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,E
 
 for i = 1:length(pos)
 q = P_c(i) - P(i);
-r0 = D(i)/2+t_ins+h_ch(i)+t_out; 
+r0 = D(i)/2+t_ins(i)+h_ch(i)+t_out; 
 ri = D(i)/2;
 r_bar = (r0+ri)/2;
 
-sigma_s_i(i) = q*w_ch(i)/2*t_ins; %3 max shear stress in the inner wall (rib-wall joint)
-sigma_b_i(i) = q/2*(w_ch(i).^2/t_ins^2); %4 max bending stress
+sigma_s_i(i) = q*w_ch(i)/2*t_ins(i); %3 max shear stress in the inner wall (rib-wall joint)
+sigma_b_i(i) = q/2*(w_ch(i).^2/t_ins(i)^2); %4 max bending stress
             %sigma_cr(i) = q/w_rib*(w_ch(i)+w_rib); %5 P is greater than p_c, compressive
             %sigma_t_r(i) = q/w_rib*w_ch(i); %6 p_c is greater than P, tensile in ribs
-sigma_phi(i) = q.*r_bar./(t_ins+t_out); %7 %circumferential stress for inner and outer wall
-sigma_phi_o(i) = alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i))./(1-nu_iw(i)).*(t_out./(t_ins+t_out)); %B4 average circumferential thermal stress
-sigma_s_r(i) = ((w_ch(i)+w_rib).*alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i)))./(5*w_rib.*(1-nu_iw(i))).*(t_out.*t_ins)/(t_out+t_ins)^.2; %B4 max thermal shear stress
+sigma_phi(i) = q.*r_bar./(t_ins(i)+t_out); %7 %circumferential stress for inner and outer wall
+sigma_phi_o(i) = alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i))./(1-nu_iw(i)).*(t_out./(t_ins(i)+t_out)); %B4 average circumferential thermal stress
+sigma_s_r(i) = ((w_ch(i)+w_rib).*alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i)))./(5*w_rib.*(1-nu_iw(i))).*(t_out.*t_ins(i))/(t_out+t_ins(i))^.2; %B4 max thermal shear stress
             %sigma_r(i) = (alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i)))./((1-nu_iw(i)).*r0.*w_rib./(w_ch(i)+w_rib)).*((t_ins+t_out)./(t_ins.*t_out)); %B4 thermal compressive in ribs
             %sigma_phi_hydro(i) = q/2*((d+h_ch+t_in+t_out)/(t_in+t_out));%B5
             %sigma_t_r_hydro(i) = q*(w_ch+w_rib)/w_rib; %B5
@@ -24,7 +24,7 @@ sigma_total_shear(i) = sigma_s_i(i)+sigma_s_r(i);
 
 % axial stress was taken from Adams definiton and is not from any paper
 if pos(i)>l_div
-    sigma_a(i) = ((P(end)*pi.*(D(i)^2/4-D_t^2/4))./ (pi .* ((D(i)/2+t_ins+h_ch(i)+t_out)^2 - D(i)^2/4) - (num_ch .* h_ch(i) .* w_ch(i)) ));
+    sigma_a(i) = ((P(end)*pi.*(D(i)^2/4-D_t^2/4))./ (pi .* ((D(i)/2+t_ins(i)+h_ch(i)+t_out)^2 - D(i)^2/4) - (num_ch .* h_ch(i) .* w_ch(i)) ));
 else
     sigma_a(i) = 0;
 end
