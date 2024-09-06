@@ -4,40 +4,40 @@ clear all; close all; clc;
 %% Geometry Inputs
 % Define channel heights (start and end) and convert from inches to meters
 h_ch_start = [0.001 0.001 0.001 0.001];% m
-h_ch_end = [0.002 0.002 0.002 0.002];% m
+h_ch_end = [0.002 0.0018 0.0018 0.002];% m
 h_ch_start = h_ch_start / 0.0254; % in
 h_ch_end = h_ch_end / 0.0254; % in
 % Generate ranges for channel heights
-h_ch_1 = linspace(h_ch_start(1), h_ch_end(1), 5);% in
-h_ch_2 = linspace(h_ch_start(2), h_ch_end(2), 5);% in
-h_ch_3 = linspace(h_ch_start(3), h_ch_end(3), 5);% in
-h_ch_4 = linspace(h_ch_start(4), h_ch_end(4), 5);% in
+h_ch_1 = linspace(h_ch_start(1), h_ch_end(1), 4);% in
+h_ch_2 = linspace(h_ch_start(2), h_ch_end(2), 3);% in
+h_ch_3 = linspace(h_ch_start(3), h_ch_end(3), 3);% in
+h_ch_4 = linspace(h_ch_start(4), h_ch_end(4), 4);% in
 
 % Define insulation thicknesses (start and end) and convert from inches to meters
 t_ins_start = [0.001 0.001 0.001 0.001];% m
-t_ins_end = [0.003 0.003 0.003 0.003];% m
+t_ins_end = [0.003 0.002 0.002 0.003];% m
 t_ins_start = t_ins_start / 0.0254; % in
 t_ins_end = t_ins_end / 0.0254; % in
 
 % Generate ranges for insulation thicknesses
-t_ins_1 = linspace(t_ins_start(1), t_ins_end(1), 5);% in
-t_ins_2 = linspace(t_ins_start(2), t_ins_end(2), 5);% in
-t_ins_3 = linspace(t_ins_start(3), t_ins_end(3), 5);% in
-t_ins_4 = linspace(t_ins_start(4), t_ins_end(4), 5);% in
+t_ins_1 = linspace(t_ins_start(1), t_ins_end(1), 4);% in
+t_ins_2 = linspace(t_ins_start(2), t_ins_end(2), 3);% in
+t_ins_3 = linspace(t_ins_start(3), t_ins_end(3), 3);% in
+t_ins_4 = linspace(t_ins_start(4), t_ins_end(4), 4);% in
 
 % Define minimum channel width and convert from inches to meters
 w_ch_min_start = 0.001; % m
-w_ch_min_end = 0.0015; % m
+w_ch_min_end = 0.001; % m
 w_ch_min_start = w_ch_min_start / 0.0254; % in
 w_ch_min_end = w_ch_min_end / 0.0254; % in
-w_ch_min = linspace(w_ch_min_start, w_ch_min_end, 5); % in
+w_ch_min = linspace(w_ch_min_start, w_ch_min_end, 1); % in
 
 % Define rib width and convert from inches to meters
 w_rib_start = 0.001; % m
-w_rib_end = 0.0015; % m
+w_rib_end = 0.0011; % m
 w_rib_start = w_rib_start / 0.0254; % in
 w_rib_end = w_rib_end / 0.0254; % in
-w_rib = linspace(w_rib_start, w_rib_end, 5);% in
+w_rib = linspace(w_rib_start, w_rib_end, 2);% in
 
 % Define output thickness and convert from inches to meters
 t_out = 0.001; % m
@@ -121,7 +121,7 @@ for i = 1:numel(w_ch_min)
                             results{case_index, 15} = dP;
 
                             % Check for highest minimum FOS and dP < 150 ksi
-                            if min_fos > max_fos && dP < 150
+                            if min_fos > max_fos && dP < 90
                                 max_fos = min_fos;
                                 best_case = case_index;
                             end
