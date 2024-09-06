@@ -76,7 +76,9 @@ function [A,D,M,P,T,w_ch,h_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,P
          2.5177748988955715, 2.34145726849852];
     CR = interp1(x_con,y_con,D_t*39.3701, 'linear');
     D_c=sqrt(CR*D_t^2); %m
-    
+    D_c=D_c*39.3701; %in
+    D_c=round(D_c*10)/10;
+    D_c=D_c/39.3701; %M
     %% Diverging
     
     % Equations for the diverging, converging and chamber geometry were used
