@@ -3,14 +3,14 @@ clc; clear; close all;
 %% Inputs
 
 % CEA Inputs
-Pc = 413; % psia
-Pe = 13.7; % psia
-O_F = 0.8;
+Pc = 313.7; % psia
+Pe = 10.2; % psia
+O_F = 0.9;
 T_inlet = 300; % K
 
 
-% res = 0.00005/20; % thermal resistance coating t/k
-res = 0;
+res = 0.00005/1; % thermal resistance coating t/k
+% res = 0;
 Thrust = 2000; % lbf
 C_star_eff = 0.94;
 C_F_eff = 0.99;
@@ -18,12 +18,12 @@ L_star = 30; % in
 h_ch_th = 0.001/0.0254; % in
 % h_ch_c = 1.5*h_ch_th; % in
 % h_ch_e = 1.5*h_ch_th; % in
-h_ch_c = 0.001/0.0254; % in
-h_ch_e = 0.001/0.0254; % in
+h_ch_c = 0.0013/0.0254; % in
+h_ch_e = 0.00145/0.0254; % in
 w_ch_min = 0.001/0.0254; % in
 w_rib = 0.001/0.0254; % in
 
-t_ins = 0.001/0.0254; % in
+t_ins = 0.0017/0.0254; % in
 t_out = 0.001/0.0254; % in
 
 
