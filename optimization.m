@@ -3,29 +3,29 @@ clear all; close all; clc;
 % start and end values
 w_ch_min_start = 0.001; % m
 w_rib_start = 0.001; % m
-t_ins_start = 0.001; % m
+t_ins_start = 0.0015; % m
 h_ch_th_start = 0.001; % m
-h_ch_c_start = 0.001; % m
+h_ch_c_start = 0.00125; % m
 h_ch_e_start = 0.001; % m
 
 h_ch_th_end = 0.001; % m
-h_ch_c_end = 0.003; % m
-h_ch_e_end = 0.003; % m
+h_ch_c_end = 0.00125; % m
+h_ch_e_end = 0.0013; % m
 w_ch_min_end = 0.001; % m
-w_rib_end = 0.003; % m
-t_ins_end = 0.0035; % m
+w_rib_end = 0.001; % m
+t_ins_end = 0.002; % m
 
 % number of values
 num_vals_w_ch_min = 1;
-num_vals_w_rib = 5;
+num_vals_w_rib = 1;
 num_vals_t_ins = 5;
 num_vals_h_ch_th = 1;
-num_vals_h_ch_c = 5;
+num_vals_h_ch_c = 1;
 num_vals_h_ch_e = 5;
 
 % CEA Inputs
 Pc = 313.7; % psia
-Pe = 13.7; % psia
+Pe = 10.2; % psia
 O_F = .9;
 T_inlet = 300; % K
 res = 0.00005/1; % thermal resistance coating
@@ -68,7 +68,7 @@ results = cell(num_cases, 11);
 
 % counter
 case_index = 1;
-
+h_waitbar = waitbar(0, 'Progress: 0% Complete');
 % loop through all parameter combinations
 for i = 1:numel(w_ch_min)
     for j = 1:numel(w_rib)
@@ -108,20 +108,27 @@ for i = 1:numel(w_ch_min)
                         results{case_index, 11} = dP;
 
                         % check for highest minimum FOS and dp<120ksi
-                        if min_fos > max_fos && dP < 120
+                        if min_fos > max_fos && dP < 105
                             max_fos = min_fos;
                             best_case = case_index;
                         end
 
                         % increase index
                         case_index = case_index + 1;
+                         progress = (i-1)*numel(w_rib)*numel(t_ins)*numel(h_ch_th)*numel(h_ch_c)*numel(h_ch_e) + ...
+                                   (j-1)*numel(t_ins)*numel(h_ch_th)*numel(h_ch_c)*numel(h_ch_e) + ...
+                                   (k-1)*numel(h_ch_th)*numel(h_ch_c)*numel(h_ch_e) + ...
+                                   (l-1)*numel(h_ch_c)*numel(h_ch_e) + ...
+                                   (m-1)*numel(h_ch_e) + ...
+                                   n;
+                        waitbar(progress / num_cases, h_waitbar, sprintf('Progress: %.2f%% Complete', (progress / num_cases) * 100));
                     end
                 end
             end
         end
     end
 end
-
+close(h_waitbar);
 % generate table
 results_table = cell2table(results, 'VariableNames', {'w_ch_min_m', 'w_rib_m', 't_ins_m', 'h_ch_th_m', 'h_ch_c_m', 'h_ch_e_m', 'v_m_stress_ksi', 'Yield_iw_ksi', 'T_chg_K', 'FOS', 'dP'});
 
