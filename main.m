@@ -5,7 +5,7 @@ clc; clear; close all;
 % CEA Inputs
 Pc = 313.7; % psia
 Pe = 10.2; % psia
-O_F = 0.9;
+O_F = 0.85;
 T_inlet = 300; % K
 
 
@@ -15,11 +15,14 @@ Thrust = 2000; % lbf
 C_star_eff = 0.94;
 C_F_eff = 0.99;
 L_star = 30; % in
-h_ch = [0.0018 0.001 0.0013 0.0013]/0.0254;
+h_ch = [0.0018 0.001 0.0013 0.0013]/0.0254; % obsolete
+
+fos = 1.1;
+
 w_ch_min = 0.001/0.0254; % in
 w_rib = 0.001/0.0254; % in
 
-t_ins = [0.0018 0.0018 0.0018 0.0018]/0.0254; % in
+t_ins = [0.003 0.002 0.002 0.002]/0.0254; % in
 t_out = 0.001/0.0254; % in
 
 
@@ -51,7 +54,7 @@ mdot_f = mdot*1/(1+O_F); %kg/s
 % D_t = D_t*0.0254; % m
 % A_t = A_t*0.0254^2; % m^2
 tic
-[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res);
+[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P);
 toc
 
 % ===STRESS===
@@ -62,7 +65,7 @@ toc
 [row_ow,E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = MatProperties_AlSi10Mg(T_co);
 
 % Stress function call
-[v_m_stress,sigma_s_i,sigma_b_i,sigma_phi,sigma_phi_i,sigma_phi_o,sigma_s_r,sigma_a] = stress_new(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,E_iw,nu_iw,h_ch,T_ci,T_co,D_t,num_ch,l_div);
+[v_m_stress] = stress_new(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,E_iw,nu_iw,h_ch,T_ci,T_co,D_t,num_ch,l_div);
 % Total Inner wall stress only
 %stressTotaliw = stressTiw + stressP_hoop;
 % ===========
@@ -169,23 +172,21 @@ ylabel('Stress (ksi)')
 legend('vonMises','Inner Wall Yield')
 grid on
 
-
 figure(8)
 clf
 hold on
 xline(pos(id_th), '--', 'Throat','HandleVisibility','off')
 xline(pos(id_c), '--', 'Chamber','HandleVisibility','off')
-plot(pos,sigma_s_i/6895000,'LineWidth',1)
-plot(pos,sigma_b_i/6895000,'LineWidth',1)
-plot(pos,sigma_phi/6895000,'LineWidth',1)
-plot(pos,sigma_phi_i/6895000,'LineWidth',1)
-plot(pos,sigma_phi_o/6895000,'LineWidth',1)
-plot(pos,sigma_s_r/6895000,'LineWidth',1)
-plot(pos,sigma_a/6895000,'LineWidth',1)
+plot(pos,w_ch,'--','LineWidth',1.5)
+plot(pos,h_ch,'--','LineWidth',1.5)
+plot(pos,w_rib*ones(1,length(pos)),'-','LineWidth',1.5)
+plot(pos,t_ins,'--','LineWidth',1.5)
+plot(pos,t_out*ones(1,length(pos)),'--','LineWidth',1.5)
 xline(0, '--', 'Exit','HandleVisibility','off')
 hold off
-title('Stress')
+title('Feature Sizes')
 xlabel('Axial Distance (m)')
-ylabel('Stress (ksi)')
-legend('Pressure Shear','Inner wall bending','Pressure circumferential','Thermal circumferential inner','Thermal circumferential outer','Thermal shear', 'Axial')
+ylabel('Feature Size (m)')
+ylim([0,0.004])
+legend('Channel Width','Channel Height','Rib Width','Inner Wall Thickness','Outer Wall Thickness')
 grid on

@@ -1,4 +1,4 @@
-function [v_m_stress,sigma_s_i,sigma_b_i,sigma_phi,sigma_phi_i,sigma_phi_o,sigma_s_r,sigma_a] = stress_new(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,E_iw,nu_iw,h_ch,T_ci,T_co,D_t,num_ch,l_div)
+function [v_m_stress] = stress_new(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,E_iw,nu_iw,h_ch,T_ci,T_co,D_t,num_ch,l_div)
 
 for i = 1:length(pos)
 q = P_c(i) - P(i);
@@ -11,15 +11,14 @@ sigma_b_i(i) = q/2*(w_ch(i).^2/t_ins(i)^2); %4 max bending stress
             %sigma_cr(i) = q/w_rib*(w_ch(i)+w_rib); %5 P is greater than p_c, compressive
             %sigma_t_r(i) = q/w_rib*w_ch(i); %6 p_c is greater than P, tensile in ribs
 sigma_phi(i) = q.*r_bar./(t_ins(i)+t_out); %7 %circumferential stress for inner and outer wall
-sigma_phi_i(i) = alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i))./(1-nu_iw(i)).*(t_out./(t_ins(i)+t_out)); %B4 average circumferential inner wall thermal stress
-sigma_phi_o(i) = alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i))./(1-nu_iw(i)).*(t_ins(i)./(t_ins(i)+t_out)); %B3 average circumferential outer wall thermal stress
+sigma_phi_o(i) = alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i))./(1-nu_iw(i)).*(t_out./(t_ins(i)+t_out)); %B4 average circumferential thermal stress
 sigma_s_r(i) = ((w_ch(i)+w_rib).*alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i)))./(5*w_rib.*(1-nu_iw(i))).*(t_out.*t_ins(i))/(t_out+t_ins(i))^.2; %B4 max thermal shear stress
             %sigma_r(i) = (alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i)))./((1-nu_iw(i)).*r0.*w_rib./(w_ch(i)+w_rib)).*((t_ins+t_out)./(t_ins.*t_out)); %B4 thermal compressive in ribs
             %sigma_phi_hydro(i) = q/2*((d+h_ch+t_in+t_out)/(t_in+t_out));%B5
             %sigma_t_r_hydro(i) = q*(w_ch+w_rib)/w_rib; %B5
             %sigma_s_i_hydro(i) = q/2*(w_ch/t_ins); %B5
             %sigma_b_i_hydro(i) = q/2*(w_ch/t_ins)^2; %B6
-sigma_total_hoop(i) = sigma_phi(i)+sigma_phi_i(i);
+sigma_total_hoop(i) = sigma_phi(i)+sigma_phi_o(i);
 sigma_total_shear(i) = sigma_s_i(i)+sigma_s_r(i);
 
 
