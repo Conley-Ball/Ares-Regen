@@ -62,7 +62,7 @@ toc
 [row_ow,E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = MatProperties_AlSi10Mg(T_co);
 
 % Stress function call
-[v_m_stress] = stress_new(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,E_iw,nu_iw,h_ch,T_ci,T_co,D_t,num_ch,l_div);
+[v_m_stress,sigma_s_i,sigma_b_i,sigma_phi,sigma_phi_i,sigma_phi_o,sigma_s_r,sigma_a] = stress_new(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,E_iw,nu_iw,h_ch,T_ci,T_co,D_t,num_ch,l_div);
 % Total Inner wall stress only
 %stressTotaliw = stressTiw + stressP_hoop;
 % ===========
@@ -167,4 +167,25 @@ title('Stress')
 xlabel('Axial Distance (m)')
 ylabel('Stress (ksi)')
 legend('vonMises','Inner Wall Yield')
+grid on
+
+
+figure(8)
+clf
+hold on
+xline(pos(id_th), '--', 'Throat','HandleVisibility','off')
+xline(pos(id_c), '--', 'Chamber','HandleVisibility','off')
+plot(pos,sigma_s_i/6895000,'LineWidth',1)
+plot(pos,sigma_b_i/6895000,'LineWidth',1)
+plot(pos,sigma_phi/6895000,'LineWidth',1)
+plot(pos,sigma_phi_i/6895000,'LineWidth',1)
+plot(pos,sigma_phi_o/6895000,'LineWidth',1)
+plot(pos,sigma_s_r/6895000,'LineWidth',1)
+plot(pos,sigma_a/6895000,'LineWidth',1)
+xline(0, '--', 'Exit','HandleVisibility','off')
+hold off
+title('Stress')
+xlabel('Axial Distance (m)')
+ylabel('Stress (ksi)')
+legend('Pressure Shear','Inner wall bending','Pressure circumferential','Thermal circumferential inner','Thermal circumferential outer','Thermal shear', 'Axial')
 grid on
