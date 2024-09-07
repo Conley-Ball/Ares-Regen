@@ -5,7 +5,7 @@ clc; clear; close all;
 % CEA Inputs
 Pc = 313.7; % psia
 Pe = 10.2; % psia
-O_F = 0.85;
+O_F = 0.88;
 T_inlet = 300; % K
 
 
@@ -22,8 +22,9 @@ fos = 1.1;
 w_ch_min = 0.001/0.0254; % in
 w_rib = 0.001/0.0254; % in
 
-t_ins = [0.003 0.002 0.002 0.002]/0.0254; % in
+t_ins = [0.001 0.001 0.001 0.001]/0.0254; % in
 t_out = 0.001/0.0254; % in
+fillet = 0.0005; % m radius
 
 
 ratio = 0.75;
@@ -54,7 +55,7 @@ mdot_f = mdot*1/(1+O_F); %kg/s
 % D_t = D_t*0.0254; % m
 % A_t = A_t*0.0254^2; % m^2
 tic
-[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P);
+[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet);
 toc
 
 % ===STRESS===

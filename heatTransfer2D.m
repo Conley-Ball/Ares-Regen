@@ -1,4 +1,4 @@
-function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P)
+function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,h_ch,w_rib,num,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet)
     T_c = zeros(1,length(pos));
     P_c = zeros(1,length(pos));
 
@@ -24,8 +24,8 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
 
     T_c(1) = T_inlet;
     pgs = 0;
-    P_c_inj = -0.5*Pc;
-    tol = 6894.76;
+    P_c_inj = -0.2*Pc;
+    tol = 16894.76;
     
     while abs(P_c_inj-(1.2*Pc)) > tol
         P_c_prev = P_c(1);
@@ -52,10 +52,11 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                     error('channel too smol')
                 end
                 %% Coolant Properties
-                [rho_c,T_sat_c(i),mu_c,k_c,Cp_c,v_c] = coolant(T_c(i),P_c(i),ratio,mdot_f,w_ch(i),h,num);
-                
+                % D_h(i) = 4*h*w_ch(i)/(2*h+2*w_ch(i));
+                [rho_c,T_sat_c(i),mu_c,k_c,Cp_c,v_c,D_h(i)] = coolant(T_c(i),P_c(i),ratio,mdot_f,w_ch(i),h,num,fillet);
+
                 %% Coolant Side Heat Transfer
-        
+                
                 Re_c = D_h(i)*v_c*rho_c/mu_c;
                 Pr_c = mu_c*Cp_c/k_c;
                 Nu_c = 0.023*Re_c^0.8*Pr_c^0.4;
@@ -154,18 +155,23 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                 epsilon_w = 2e-5; % m
                 f = (-1.8*log10((epsilon_w/3.7/D_h(i))^1.11+6.9/Re_c))^-2; % []
                 if i+1 <= length(pos)
-                    if D_h(i+1) > D_h(i)
-                        K_L = ((D_h(i)/D_h(i+1))^2-1)^2;
-                    elseif D_h(i+1) < D_h(i)
-                        K_L = 0.5-0.167*(D_h(i+1)/D_h(i))-0.125*(D_h(i+1)/D_h(i))^2-0.208*(D_h(i+1)/D_h(i))^3;
+                    if i == 1
+                        K_L = 0;
+                    else
+                    if D_h(i) > D_h(i-1)
+                        K_L = ((D_h(i-1)/D_h(i))^2-1)^2;
+                    elseif D_h(i) < D_h(i-1)
+                        K_L = 0.5-0.167*(D_h(i)/D_h(i-1))-0.125*(D_h(i)/D_h(i-1))^2-0.208*(D_h(i)/D_h(i-1))^3;
                     else
                         K_L = 0;
+                    end
                     end
                     P_c(i+1) = P_c(i) - rho_c*v_c^2/2*(K_L+f*step(i)/D_h(i)); % Pa
                     T_c(i+1) = T_c(i) + pi*D(i)*step(i)*q(i)/(mdot_f*Cp_c); % K
                     if P_c(i+1) < 0
                         error('Negative Coolant Pressure')
                     end
+                    
                 end
     
                 [~,E_iw,nu_iw,alpha_iw,~,~,yield(j)] = MatProperties_AlSi10Mg(T_ci(i));
