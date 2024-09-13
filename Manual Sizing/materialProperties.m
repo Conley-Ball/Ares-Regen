@@ -125,7 +125,7 @@ function [E,nu,alpha,k,Cp,Yield] = materialProperties(T,material)
         858	508000000;
         918	371000000];
 
-    elseif strcmp(material,'inconel') % Inconel 718
+    elseif strcmp(material,'inconel') % Inconel not heat treated 718
         % Elastic modulous [Pa]
         E_table = [294	165000000000;
         810	    152000000000;
@@ -175,11 +175,77 @@ function [E,nu,alpha,k,Cp,Yield] = materialProperties(T,material)
         1773	652];
         
         % Yield Strength [Pa]
-        Yield_table = [294	648000000;
-        811	    558000000;
-        1089	338000000;
-        1255	90000000;
-        1366	34000000];
+        Yield_table = [291.0       581995160.7;
+        450.9       540384714.4;
+        570.7       515171555.2;
+        681.2       507408317.0;
+        757.1       502956712.7;
+        805.2       524696844.3;
+        880.3       654306149.9;
+        917.4       684778903.1;
+        958.7       643311974.5;
+        1009.3      503741208.4;
+        1083.4      195204583.0];
+
+         elseif strcmp(material,'inconel (HT)') % Inconel heat treated 718
+        % Elastic modulous [Pa]
+        E_table = [294	165000000000;
+        810	    152000000000;
+        1088	110000000000;
+        1255	55000000000;
+        1366	34000000000];
+        
+        % Poison's Ratio
+        nu_table = [294	0.3;
+        810	    0.28;
+        1088	0.323;
+        1255	0.368;
+        1366	0.4];
+        
+        % Thermal Expansion [1/K]
+        alpha_table = [700	1.44E-05;
+        811	    1.49E-05;
+        922	    1.54E-05;
+        1144	1.75E-05;
+        1366	1.83E-05;
+        2100	1.83E-05];
+        
+        % Thermal Conductivity [W/mK]
+        k_table = [295	11.9;
+        506	    13.7;
+        721	    16.9;
+        930	    21.7;
+        1139	25.6;
+        1352	22.9;
+        1562	19.1;
+        1773	17.7];
+        
+        % Specific heat [J/kg]
+        Cp_table = [293	421;
+        373	    442;
+        473	    453;
+        573	    472;
+        673	    481;
+        773	    502;
+        873	    527;
+        973	    562;
+        1073	606;
+        1123	628;
+        1173	636;
+        1273	647;
+        1373	651;
+        1773	652];
+        
+        % Yield Strength [Pa]
+        Yield_table = [291.7	1190168778.1;
+        470.5	    1128916828.2;
+        627.4       1075320861.4;
+        760.6       1030472838.2;
+        839.1       987871046.8;
+        902.3       922399368.4;
+        955.8       739228315.4;
+        1016.9      499372343.9;
+        1084.2      195203561.6];
     else
         error('Invalid material')
     end
