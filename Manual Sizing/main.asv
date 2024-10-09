@@ -4,7 +4,7 @@ clc; clear; close all;
 
 material =              'inconel (HT)'; % Select from: 'steel' 'aluminum' 'inconel'
 Pc =                    293.7; % psia
-O_F =                   1.4;
+O_F =                   0.9;
 Thrust =                2000; % lbf
 fos =                   1.25;
 
@@ -25,9 +25,9 @@ eth_ratio =             0.75;
 h_ch =                  [0.0015 0.001 0.00125 0.002]/0.0254; % in
 w_ch_min =              0.001/0.0254; % in
 w_rib =                 0.001/0.0254; % in
-t_ins =                 [0.00125 0.00125 0.00125 0.00125]/0.0254; % in
+t_ins =                 [0.001 0.0005 0.001 0.001]/0.0254; % in
 t_out =                 [0.002 0.002 0.002 0.002]/0.0254; % in
-fillet =                0.0003; % m radius
+fillet =                0.0001250; % m radius
 
 % ===CEA===
 

@@ -1,4 +1,4 @@
-function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,w_rib,num,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch)
+function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2,v_c] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,w_rib,num,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch)
     
     % Preallocation
     T_c = zeros(1,length(pos));
@@ -36,11 +36,11 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
 
 
                 %% Coolant Properties
-                [rho_c,T_sat_c(i),mu_c,k_c,Cp_c,st_c,v_c,D_h(i),rho_c_liquid,rho_c_vapor,h_c_liquid,h_c_vapor] = coolant(T_c(i),P_c(i),ratio,mdot_f,w_ch(i),h_ch(i),num,fillet);
+                [rho_c,T_sat_c(i),mu_c,k_c,Cp_c,st_c,v_c(i),D_h(i),rho_c_liquid,rho_c_vapor,h_c_liquid,h_c_vapor] = coolant(T_c(i),P_c(i),ratio,mdot_f,w_ch(i),h_ch(i),num,fillet);
 
                 %% Critical Heat Flux
 
-                q_crit(i) = 0.1003+0.05264*(v_c*(T_sat_c(i))-T_c(i))^0.5; %Btu/h/in^2
+                q_crit(i) = 0.1003+0.05264*( v_c(i)*3.281 * (T_sat_c(i)-T_c(i))*9/5 )^0.5; %Btu/h/in^2
                 F_p = 1.17-0.000856*P_c(i)/6894.76;
                 q_crit(i) = q_crit(i) * F_p;
                 q_crit(i) = q_crit(i) * 1055.06/0.00064516; %W/m^2
@@ -54,7 +54,7 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                 
                 %% Coolant Side Heat Transfer
                 
-                Re_c = D_h(i)*v_c*rho_c/mu_c;
+                Re_c = D_h(i)*v_c(i)*rho_c/mu_c;
                 Pr_c = mu_c*Cp_c/k_c;
                 Nu_c = 0.023*Re_c^0.8*Pr_c^0.4;
     
@@ -159,9 +159,9 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                             K_L = 0;
                         end
                     end
-                    P_c(i+1) = P_c(i) - rho_c*v_c^2/2*(K_L+f*step(i)/D_h(i)); % Pa
+                    P_c(i+1) = P_c(i) - rho_c*v_c(i)^2/2*(K_L+f*step(i)/D_h(i)); % Pa
                     T_c(i+1) = T_c(i) + pi*D(i)*step(i)*q(i)/(mdot_f*Cp_c); % K
-                    if v_c > 343
+                    if v_c(i) > 343
                         error('supersonic coolant')
                     end
                     if P_c(i+1) < 0
