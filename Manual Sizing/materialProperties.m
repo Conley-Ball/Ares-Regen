@@ -179,11 +179,11 @@ function [E,nu,alpha,k,Cp,Yield] = materialProperties(T,material)
         450.9       540384714.4;
         570.7       515171555.2;
         681.2       507408317.0;
-        757.1       502956712.7;
-        805.2       524696844.3;
-        880.3       654306149.9;
-        917.4       684778903.1;
-        958.7       643311974.5;
+        % 757.1       502956712.7;
+        % 805.2       524696844.3;
+        % 880.3       654306149.9;
+        % 917.4       684778903.1;
+        % 958.7       643311974.5;
         1009.3      503741208.4;
         1083.4      195204583.0];
 
@@ -253,30 +253,30 @@ function [E,nu,alpha,k,Cp,Yield] = materialProperties(T,material)
     % Elastic modulous [Pa]
     E_interp = griddedInterpolant(E_table(:,1), E_table(:,2));
     E = E_interp(T);
-    % E = interp1(E_table(:,1), E_table(:,2),T,'pchip');
+    E = interp1(E_table(:,1), E_table(:,2),T,'pchip');
     
     % Poison's Ratio
     nu_interp = griddedInterpolant(nu_table(:,1), nu_table(:,2));
     nu = nu_interp(T);
-    % nu = interp1(nu_table(:,1), nu_table(:,2),T,'pchip');
+    nu = interp1(nu_table(:,1), nu_table(:,2),T,'pchip');
     
     % Thermal Expansion [1/K]
     alpha_interp = griddedInterpolant(alpha_table(:,1), alpha_table(:,2));
     alpha = alpha_interp(T);
-    % alpha = interp1(alpha_table(:,1), alpha_table(:,2),T,'pchip');
+    alpha = interp1(alpha_table(:,1), alpha_table(:,2),T,'pchip');
     
     % Thermal Conductivity [W/mK]
     k_interp = griddedInterpolant(k_table(:,1), k_table(:,2));
     k = k_interp(T);
-    % k = interp1(k_table(:,1), k_table(:,2),T,'pchip');
+    k = interp1(k_table(:,1), k_table(:,2),T,'pchip');
     
     % Specific heat [J/kg]
     Cp_interp = griddedInterpolant(Cp_table(:,1), Cp_table(:,2));
     Cp = Cp_interp(T);
-    % Cp = interp1(Cp_table(:,1), Cp_table(:,2),T,'pchip');
+    Cp = interp1(Cp_table(:,1), Cp_table(:,2),T,'pchip');
     
     % Yield Strength [Pa]
     Yield_interp = griddedInterpolant(Yield_table(:,1), Yield_table(:,2));
     Yield = Yield_interp(T)*1;
-    % Yield = interp1(Yield_table(:,1), Yield_table(:,2),T,'pchip');
+    Yield = interp1(Yield_table(:,1), Yield_table(:,2),T,'pchip');
 end

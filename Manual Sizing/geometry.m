@@ -69,6 +69,7 @@ function [A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdo
     D_c=D_c*39.3701; %in
     D_c=round(D_c*10)/10;
     D_c=D_c/39.3701; %M
+    D_c = 4.5*0.0254; % m
     %% Diverging
     
     % Equations for the diverging, converging and chamber geometry were used
