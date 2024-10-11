@@ -22,14 +22,14 @@ C_F_eff =               0.99;
 T_inlet =               300; % K
 eth_ratio =             0.75;
 
-h_ch =                  [0.0015 0.00075 0.00125 0.0015]/0.0254; % in
+h_ch =                  [0.0015 0.001 0.00125 0.0015]/0.0254; % in
 w_ch_min =              0.0005/0.0254; % in
 w_rib =                 0.001/0.0254; % in
 t_ins =                 [0.002 0.00075 0.00125 0.0015]/0.0254; % in
 t_out =                 [0.002 0.002 0.002 0.002]/0.0254; % in
 fillet =                0.000250; % m radius
 
-pitch = 30;
+pitch = 40;
 
 % ===CEA===
 
@@ -43,13 +43,13 @@ num_nodes = 600; % Station Resolution
 mdot_f = mdot*1/(1+O_F); %kg/s
 fprintf('Geometry Finished\n')
 
-[x_coords,y_coords] = helical(D,pos,pitch,t_ins);
+[x_coords,y_coords,phi] = helical(D,pos,pitch,t_ins,h_ch);
 
 % ===HEAT TRANSFER===
 
 fprintf('Heat Transfer       \n')
 ch_resolution = 1e-5; % m
-[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,eth_ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch);
+[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,eth_ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch,pitch);
 fprintf('\b\b\b\b\b\b\bFinished\n')
 
 % ARBITRARY TEMPERATURE ADJUSTMENT FROM FEA

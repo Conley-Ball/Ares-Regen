@@ -1,4 +1,4 @@
-function [x_coords,y_coords] = helical(D,pos,pitch,t_ins)
+function [x_coords,y_coords,phi] = helical(D,pos,pitch,t_ins,h_ch)
     x_coords = zeros(1,length(pos));
     y_coords = zeros(1,length(pos));
     dr_dz = zeros(1,length(pos));
@@ -13,7 +13,8 @@ function [x_coords,y_coords] = helical(D,pos,pitch,t_ins)
         dr_dz(i) = (r(i+1)-r(i))/(pos(i+1)-pos(i)); %manually calculate differential
     end
     for i = 1:length(pos)-1
-        beta(i) = (((pos(i+1)-pos(i))*tan(alpha))^2+())
+        phi(i) = atan( ((((pos(i+1)-pos(i)) *tan(alpha) )^2 + h_ch(i)^2) / (pos(i+1)-pos(i))^2)^0.5);
+        
         theta(i) = theta_0(i) + tan(alpha)/r(i)*sqrt(1+(dr_dz(i))^2)*(pos(i+1)-pos(i)); %angle
         x_coords(i) = r(i)*cos(theta(i));
         y_coords(i) = r(i)*sin(theta(i));
