@@ -41,5 +41,5 @@ function [rho_c,T_sat_c,P_sat_c,mu_c,k_c,Cp_c,st_c,v_c,D_h,rho_c_liquid,rho_c_va
         A_c = w_ch*h_ch - (2*fillet)^2 + pi*fillet^2;
         Per = 2*(w_ch-2*fillet)+2*(h_ch-2*fillet)+2*fillet*pi;
         D_h = 4*A_c/Per;
-        v_c = mdot_f/(A_c*num*rho_c*cosd(alpha));
+        v_c = mdot_f/(A_c*num*rho_c*cos(alpha));
 end
