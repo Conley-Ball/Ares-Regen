@@ -40,7 +40,7 @@ fprintf('CEA Finished\n')
 
 % ===GEOMETRY===
 
-num_nodes = 200; % Station Resolution
+num_nodes = 500; % Station Resolution
 [A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,A_e,D_e,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div,h_ch,psi,phi,dtheta] = geometry(Thrust,Pc,Pe,mdot,A_t,D_t,A_e,D_e,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes,h_ch,pitch,max_angle,throat_only);
 mdot_f = mdot*1/(1+O_F); %kg/s
 fprintf('Geometry Finished\n')
@@ -73,8 +73,8 @@ A_ox = (mdot-mdot_f)/(0.75*(2*1141*0.2*Pc)^0.5);
 
 % ==SOLIDWORKS==
 
-% curveHelper(D, t_ins, h_ch, t_out, pos, dtheta, psi, w_rib, w_ch, num_ch)
-% fprintf('Geometry Exported\n')
+curveHelper(D, t_ins, h_ch, t_out, pos, dtheta, psi, w_rib, w_ch, num_ch)
+fprintf('Geometry Exported\n')
 
 % ===GRAPHS===
 
