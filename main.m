@@ -12,8 +12,9 @@ fos =                   600;
 roughness =             9e-6; % m
 stiffness =             0.2;
 L_star =                30; % in
-angle_conv =            30; % deg
-pitch =                 35; % deg
+angle_conv =            40; % deg
+pitch =                 15; % deg
+throat_only =           true;
 max_angle =             45; % deg
 Pe =                    10.3; % psia
 Cd =                    0.7;
@@ -25,9 +26,9 @@ C_F_eff =               0.99;
 T_inlet =               300; % K
 eth_ratio =             0.75;
 
-h_ch =                  [0.001 0.00075 0.001 0.00125]/0.0254;  % higher raises Q, lower lowers Q
-w_ch_min =              0.0012/0.0254;                      % higher raises Q, lower lowers Q
-w_rib =                 [0.00125 0.00125 0.00125 0.00125]/0.0254;                      
+h_ch =                  [0.001 0.00075 0.001 0.001]/0.0254;  % higher raises Q, lower lowers Q
+w_ch_min =              0.0014/0.0254;                      % higher raises Q, lower lowers Q
+w_rib =                 [0.001 0.00175 0.001 0.001]/0.0254;                      
 t_ins =                 [0.00124 0.0005 0.001 0.00125]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
 t_out =                 [0.0015 0.0015 0.0015 0.0015]/0.0254; % in
 fillet =                0.000250; % m radius
@@ -40,7 +41,7 @@ fprintf('CEA Finished\n')
 % ===GEOMETRY===
 
 num_nodes = 200; % Station Resolution
-[A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,A_e,D_e,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div,h_ch,psi,phi,dtheta] = geometry(Thrust,Pc,Pe,mdot,A_t,D_t,A_e,D_e,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes,h_ch,pitch,max_angle);
+[A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,A_e,D_e,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div,h_ch,psi,phi,dtheta] = geometry(Thrust,Pc,Pe,mdot,A_t,D_t,A_e,D_e,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes,h_ch,pitch,max_angle,throat_only);
 mdot_f = mdot*1/(1+O_F); %kg/s
 fprintf('Geometry Finished\n')
 

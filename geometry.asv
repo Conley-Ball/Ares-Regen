@@ -179,8 +179,7 @@ function [A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdo
         alpha = pitch*pi/180;
     else
         alpha = pitch*pi/180;
-        alpha = [linspace(0,pitch*pi/180,100) linspace(pitch*pi/180,0,100) zeros(1,100)];
-        alpha = interp1(x,alpha,pos);
+        alpha = [linspace(0,pitch*pi/180,length(x_div)) linspace(pitch*pi/180,0,length(x_conv)) zeros(1,length(xc))];
     end
     dtheta = tan(alpha)./r.*(dz.^2+dr.^2).^0.5;
     psi = atan(dr./dz);
