@@ -8,6 +8,7 @@ O_F =                   1.0;
 Thrust =                2000; % lbf
 fos =                   600;
 
+
 roughness =             9e-6; % m
 stiffness =             0.2;
 L_star =                30; % in
@@ -24,11 +25,11 @@ C_F_eff =               0.99;
 T_inlet =               300; % K
 eth_ratio =             0.75;
 
-h_ch =                  [0.001 0.0006 0.001 0.001]/0.0254;  % higher raises Q, lower lowers Q
-w_ch_min =              0.0007/0.0254;                      % higher raises Q, lower lowers Q
-w_rib =                 0.0005/0.0254;                      % higher lowers Q, lower raises Q
-t_ins =                 [0.001 0.0005 0.001 0.001]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
-t_out =                 [0.002 0.002 0.002 0.002]/0.0254; % in
+h_ch =                  [0.001 0.00075 0.001 0.001]/0.0254;  % higher raises Q, lower lowers Q
+w_ch_min =              0.00125/0.0254;                      % higher raises Q, lower lowers Q
+w_rib =                 [0.0008 0.00055 0.0008 0.0015]/0.0254;                      
+t_ins =                 [0.00075 0.0005 0.00075 0.001]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
+t_out =                 [0.0015 0.0015 0.0015 0.0015]/0.0254; % in
 fillet =                0.000250; % m radius
 
 % ===CEA===
@@ -201,7 +202,7 @@ xline(pos(id_th), '--', 'Throat','HandleVisibility','off')
 xline(pos(id_c), '--', 'Chamber','HandleVisibility','off')
 plot(pos,w_ch,'--','LineWidth',1.5)
 plot(pos,h_ch,'--','LineWidth',1.5)
-plot(pos,w_rib*ones(1,length(pos)),'-','LineWidth',1.5)
+plot(pos,w_rib,'--','LineWidth',1.5)
 plot(pos,t_ins,'--','LineWidth',1.5)
 plot(pos,t_out,'--','LineWidth',1.5)
 xline(0, '--', 'Exit','HandleVisibility','off')

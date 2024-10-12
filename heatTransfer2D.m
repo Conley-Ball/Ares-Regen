@@ -48,7 +48,7 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                 % h_c_nb = 0;
 
                 % Geometry
-                w = w_rib; % m
+                w = w_rib(i); % m
                 b = w_ch(i); % m
                 t = t_ins(i);
                 h = h_ch(i);

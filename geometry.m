@@ -183,28 +183,35 @@ function [A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdo
 
     
     %% Channels
-    
+    circ_t = 2*pi*(D_t/2+t_ins(2));
+    num_ch = floor(circ_t/(w_rib(2)+w_ch_min));
+
     x = [linspace(0,x_div(end),100) linspace(x_conv(1),x_conv(end),100) linspace(xc(1),xc(end),100)];
     t_ins = [linspace(t_ins(1),t_ins(2),100) linspace(t_ins(2),t_ins(3),100) linspace(t_ins(3),t_ins(4),100)];
     t_out = [linspace(t_out(1),t_out(2),100) linspace(t_out(2),t_out(3),100) linspace(t_out(3),t_out(4),100)];
     h_ch = [linspace(h_ch(1),h_ch(2),100) linspace(h_ch(2),h_ch(3),100) linspace(h_ch(3),h_ch(4),100)];
-
+    w_rib = [linspace(w_rib(1),w_rib(2),100) linspace(w_rib(2),w_rib(3),100) linspace(w_rib(3),w_rib(4),100)];
     % t_out = interp1(x,t_out,pos)./cos(psi);
     % t_ins = interp1(x,t_ins,pos)./cos(psi);
     % h_ch = interp1(x,h_ch,pos)./cos(psi);
     t_out = interp1(x,t_out,pos);
     t_ins = interp1(x,t_ins,pos);
     h_ch = interp1(x,h_ch,pos);
-
+    w_rib = interp1(x,w_rib,pos);
     %circumference of the outer side of the inner wall is calculated
     circ = 2*pi*(r+t_ins);
+    w_ch = circ/num_ch-w_rib;
+
     %throat circumference is calculated
-    circ_t = 2*pi*D_t/2;
+    
     %number of channels is the minimum that can fit the throat with a minimum
     %rib thickness and minimum channel width (channel geometry method may be updated in the future)
-    num_ch = floor(circ_t/(w_rib+w_ch_min));
+    
     %actual channel width can be found now based on the number of channels
-    w_ch = circ/num_ch-w_rib;
+
+    
+    
+    
 
     % x = [linspace(0,x_div(end),100) linspace(x_conv(1),x_conv(end),100) linspace(xc(1),xc(floor(length(xc)/(2*pi))),100) linspace(xc(ceil(length(xc)/(2*pi))),xc(end),100)];
     

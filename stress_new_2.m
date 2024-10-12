@@ -50,17 +50,17 @@ sigma_s_o(i) = q2*w_ch(i)/2*t_out(i);
 
 % Compressive or tensile stress in the ribs due to pressure difference between channel and chamber (5),(6)
 if P(i)>P_c(i)
-    sigma_c_r(i) = q1/w_rib*(w_ch(i)+w_rib);
+    sigma_c_r(i) = q1/w_rib(i)*(w_ch(i)+w_rib(i));
     sigma_t_r(i) = 0;
 else
     sigma_c_r(i) = 0;
-    sigma_t_r(i) = q1/w_rib*w_ch(i); % channel hydrostat if chamber pressure is zero
+    sigma_t_r(i) = q1/w_rib(i)*w_ch(i); % channel hydrostat if chamber pressure is zero
 end
 
 % Largest shear stress if shear strain in ribs is negligible (B4)
-sigma_s_r(i) = ((w_ch(i)+w_rib).*alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i)))./(5*w_rib.*(1-nu_iw(i))).*(t_out(i).*t_ins(i))/(t_out(i)+t_ins(i))^.2;
+sigma_s_r(i) = ((w_ch(i)+w_rib(i)).*alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i)))./(5*w_rib(i).*(1-nu_iw(i))).*(t_out(i).*t_ins(i))/(t_out(i)+t_ins(i))^.2;
 % Compressive loading in ribs due to imposed tempurature difference between inner and outer walls (B4)
-sigma_r(i) = (alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i)))./(((1-nu_iw(i)).*r0(i).*w_rib./(w_ch(i)+w_rib)).*((t_ins(i)+t_out(i))./(t_ins(i).*t_out(i))));
+sigma_r(i) = (alpha_iw(i).*E_iw(i).*(T_ci(i)-T_co(i)))./(((1-nu_iw(i)).*r0(i).*w_rib(i)./(w_ch(i)+w_rib(i))).*((t_ins(i)+t_out(i))./(t_ins(i).*t_out(i))));
 
 %% Axial stress                                                                      
 if pos(i)>l_div
@@ -73,6 +73,6 @@ end
 q_max = P_c(i);
 sigma_s_i_hydro(i) = q_max*w_ch(i)/2*t_ins(i); %max shear
 sigma_b_i_hydro(i) = q_max/2*(w_ch(i).^2/t_ins(i).^2); %max bending
-sigma_t_r_hydro(i) = q_max/w_rib*w_ch(i); %max tensile in ribs
+sigma_t_r_hydro(i) = q_max/w_rib(i)*w_ch(i); %max tensile in ribs
 end
 end
