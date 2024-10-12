@@ -12,15 +12,15 @@ fos =                   600;
 roughness =             9e-6; % m
 stiffness =             0.2;
 L_star =                30; % in
-angle_conv =            35; % deg
+angle_conv =            40; % deg
 pitch =                 25; % deg
-throat_only =           false;
+throat_only =           true;
 max_angle =             45; % deg
 Pe =                    10.3; % psia
 Cd =                    0.7;
 
 res =                   0.00005/1; % thermal resistance coating t/k
-% res =                   0;
+%res =                   0;
 C_star_eff =            0.94;
 C_F_eff =               0.99;
 T_inlet =               300; % K
@@ -28,8 +28,8 @@ eth_ratio =             0.75;
 
 h_ch =                  [0.001 0.00075 0.001 0.001]/0.0254;  % higher raises Q, lower lowers Q
 w_ch_min =              0.0014/0.0254;                      % higher raises Q, lower lowers Q
-w_rib =                 [0.001 0.00175 0.001 0.001]/0.0254;                      
-t_ins =                 [0.00124 0.0005 0.00075 0.00125]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
+w_rib =                 [0.001 0.00175 0.0005 0.0005]/0.0254;                      
+t_ins =                 [0.001 0.0005 0.00075 0.001]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
 t_out =                 [0.0015 0.0015 0.0015 0.0015]/0.0254; % in
 fillet =                0.000250; % m radius
 
