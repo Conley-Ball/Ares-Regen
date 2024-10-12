@@ -26,10 +26,10 @@ C_F_eff =               0.99;
 T_inlet =               300; % K
 eth_ratio =             0.75;
 
-h_ch =                  [0.001 0.00075 0.001 0.001]/0.0254;  % higher raises Q, lower lowers Q
-w_ch_min =              0.0014/0.0254;                      % higher raises Q, lower lowers Q
-w_rib =                 [0.001 0.00175 0.0005 0.0005]/0.0254;                      
-t_ins =                 [0.001 0.0005 0.00075 0.001]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
+h_ch =                  [0.0015 0.00075 0.001 0.00125]/0.0254;  % higher raises Q, lower lowers Q
+w_ch_min =              0.0015/0.0254;                      % higher raises Q, lower lowers Q
+w_rib =                 [0.00075 0.0015 0.0005 0.001]/0.0254;                      
+t_ins =                 [0.00135 0.0005 0.00075 0.0015]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
 t_out =                 [0.0015 0.0015 0.0015 0.0015]/0.0254; % in
 fillet =                0.000250; % m radius
 
