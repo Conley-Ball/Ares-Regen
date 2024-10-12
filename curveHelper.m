@@ -14,8 +14,8 @@ function curveHelper(D, t_ins, h_ch, t_out, pos, dtheta, psi)
         theta(i) = theta_0 + dtheta(i);
         theta_0 = theta(i);
     end
-    x = (D/2+t_ins).*cos(theta);
-    z = (D/2+t_ins).*sin(theta);
+    x = (D/2+(t_ins).*cos(psi)).*cos(theta);
+    z = (D/2+(t_ins).*cos(psi)).*sin(theta);
     rib = [x' pos' z'];
     writematrix(rib)
 end
