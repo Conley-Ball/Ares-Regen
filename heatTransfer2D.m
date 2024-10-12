@@ -21,7 +21,7 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
     T_c(1) = T_inlet;
     pgs = 0;
     tol = 6895;
-    errorP = -1.2*tol+1;
+    errorP = -1.5*tol+1;
     P_c(1) = Pc*(1+stiffness);
     while abs(errorP) > tol
         P_c = [P_c(1)-errorP zeros(1,length(pos)-1)];

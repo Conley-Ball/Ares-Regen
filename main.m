@@ -8,11 +8,11 @@ O_F =                   1.0;
 Thrust =                2000; % lbf
 fos =                   600;
 
-roughness =             1e-5; % m
+roughness =             9e-6; % m
 stiffness =             0.2;
 L_star =                30; % in
-angle_conv =            35; % deg
-pitch =                 30; % deg
+angle_conv =            30; % deg
+pitch =                 35; % deg
 max_angle =             45; % deg
 Pe =                    10.3; % psia
 Cd =                    0.7;
@@ -24,10 +24,10 @@ C_F_eff =               0.99;
 T_inlet =               300; % K
 eth_ratio =             0.75;
 
-h_ch =                  [0.0015 0.001 0.00125 0.0015]/0.0254; % in
-w_ch_min =              0.0005/0.0254; % in
-w_rib =                 0.001/0.0254; % in
-t_ins =                 [0.002 0.00075 0.00125 0.0015]/0.0254; % in
+h_ch =                  [0.001 0.0006 0.001 0.001]/0.0254; % in
+w_ch_min =              0.0007/0.0254; % in
+w_rib =                 0.0005/0.0254; % in
+t_ins =                 [0.001 0.0005 0.001 0.001]/0.0254; % in
 t_out =                 [0.002 0.002 0.002 0.002]/0.0254; % in
 fillet =                0.000250; % m radius
 
@@ -72,6 +72,7 @@ A_ox = (mdot-mdot_f)/(0.75*(2*1141*0.2*Pc)^0.5);
 % ==SOLIDWORKS==
 
 curveHelper(D, t_ins, h_ch, t_out, pos, dtheta, psi)
+fprintf('Geometry Exported\n')
 
 % ===GRAPHS===
 
