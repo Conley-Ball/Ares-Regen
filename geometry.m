@@ -191,12 +191,12 @@ function [A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdo
         error('Pitch too high for print (%f degrees). Consider lowering pitch or nozzle angle.',max(phi)*180/pi)
     end
 
-    hold on
-    plot(pos,alpha*180/pi);
-    plot(pos,psi*180/pi);
-    plot(pos,phi*180/pi);
-    legend('alpha','psi','phi')
-    hold off
+    % hold on
+    % plot(pos,alpha*180/pi);
+    % plot(pos,psi*180/pi);
+    % plot(pos,phi*180/pi);
+    % legend('alpha','psi','phi')
+    % hold off
 
 
     t_out = interp1(x,t_out,pos);
