@@ -8,10 +8,12 @@ O_F =                   1.0;
 Thrust =                2000; % lbf
 fos =                   600;
 
-roughness =             1e-5; % m
+roughness =             9e-6; % m
 stiffness =             0.2;
 L_star =                30; % in
-angle_conv =            45; % deg
+angle_conv =            30; % deg
+pitch =                 35; % deg
+max_angle =             45; % deg
 Pe =                    10.3; % psia
 Cd =                    0.7;
 
@@ -22,14 +24,12 @@ C_F_eff =               0.99;
 T_inlet =               300; % K
 eth_ratio =             0.75;
 
-h_ch =                  [0.0015 0.001 0.00125 0.0015]/0.0254; % in
-w_ch_min =              0.0005/0.0254; % in
-w_rib =                 0.001/0.0254; % in
-t_ins =                 [0.002 0.00075 0.00125 0.0015]/0.0254; % in
+h_ch =                  [0.001 0.0006 0.001 0.001]/0.0254; % higher raises heat flux, lower lowers heat flux
+w_ch_min =              0.0007/0.0254; % higher raises heat flux, lower lowers heat flux
+w_rib =                 0.0005/0.0254; % higher lowers heat flux, lower raises heat flux
+t_ins =                 [0.001 0.0005 0.001 0.001]/0.0254; % higher lowers heat flux, lower raises heat flux
 t_out =                 [0.002 0.002 0.002 0.002]/0.0254; % in
 fillet =                0.000250; % m radius
-
-pitch = 30;
 
 % ===CEA===
 
@@ -39,11 +39,9 @@ fprintf('CEA Finished\n')
 % ===GEOMETRY===
 
 num_nodes = 600; % Station Resolution
-[A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,A_e,D_e,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div,h_ch] = geometry(Thrust,Pc,Pe,mdot,A_t,D_t,A_e,D_e,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes,h_ch);
+[A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,A_e,D_e,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div,h_ch,psi,phi,dtheta] = geometry(Thrust,Pc,Pe,mdot,A_t,D_t,A_e,D_e,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes,h_ch,pitch,max_angle);
 mdot_f = mdot*1/(1+O_F); %kg/s
 fprintf('Geometry Finished\n')
-
-[x_coords,y_coords,phi] = helical(D,pos,pitch,t_ins,h_ch);
 
 % ===HEAT TRANSFER===
 
@@ -51,11 +49,6 @@ fprintf('Heat Transfer       \n')
 ch_resolution = 1e-5; % m
 [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,eth_ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch,phi);
 fprintf('\b\b\b\b\b\b\bFinished\n')
-
-% ARBITRARY TEMPERATURE ADJUSTMENT FROM FEA
-
-% T_ci = T_ci + 100;
-
 
 % ===STRESS===
 
@@ -78,17 +71,26 @@ A_ox = (mdot-mdot_f)/(0.75*(2*1141*0.2*Pc)^0.5);
 
 % ==SOLIDWORKS==
 
-curveHelper(D, t_ins, h_ch, t_out, pos)
+curveHelper(D, t_ins, h_ch, t_out, pos, dtheta, psi)
+fprintf('Geometry Exported\n')
 
 % ===GRAPHS===
 
-figure (1)
+f1 = figure(1);
 hold on
-plot(pos,D/2)
-plot(pos,-D/2)
+plot(pos,D/2,'Color','k')
+plot((pos+(t_ins).*sin(-psi)),(D/2+(t_ins).*cos(psi)),'Color','k')
+plot((pos+(t_ins+h_ch).*sin(-psi)),(D/2+(t_ins+h_ch).*cos(psi)),'Color','k')
+plot((pos+(t_ins+h_ch+t_out).*sin(-psi)),(D/2+(t_ins+h_ch+t_out).*cos(psi)),'Color','k')
+plot(pos,-D/2,'Color','k')
+plot((pos+(t_ins).*sin(-psi)),-(D/2+(t_ins).*cos(psi)),'Color','k')
+plot((pos+(t_ins+h_ch).*sin(-psi)),-(D/2+(t_ins+h_ch).*cos(psi)),'Color','k')
+plot((pos+(t_ins+h_ch+t_out).*sin(-psi)),-(D/2+(t_ins+h_ch+t_out).*cos(psi)),'Color','k')
 hold off
-title('contour')
 axis equal
+title('Contour')
+grid on
+% f1.Position = [200,200,600,400];
 
 f2 = figure(2);
 clf
@@ -104,7 +106,7 @@ xlabel('Axial Distance (m)')
 ylabel('Temperature (K)')
 legend('T_c','T_{saturation}')
 grid on
-f2.Position = [200,200,600,400];
+% f2.Position = [200,200,600,400];
 
 f3 = figure(3);
 clf
@@ -118,7 +120,7 @@ title('Coolant Pressure')
 xlabel('Axial Distance (m)')
 ylabel('Pressure (psia)')
 grid on
-f3.Position = [200,200,600,400];
+% f3.Position = [200,200,600,400];
 
 f4 = figure(4);
 clf
@@ -135,7 +137,7 @@ xlabel('Axial Distance (m)')
 ylabel('Heat Flux (W/m^2)')
 legend('Heat Flux (W/m^2)','Critical Heat Flux(W/m^2)','Rosenhow Critical Heat Flux(W/m^2)')
 grid on
-f4.Position = [200,200,500,400];
+% f4.Position = [200,200,500,400];
 
 
 f5 = figure(5);
@@ -155,7 +157,7 @@ xlabel('Axial Distance (m)')
 ylabel('Temperature (K)')
 legend('T_{w}','T_{cb}','T_{ci}','T_{ct}','T_{co}')
 grid on
-f5.Position = [200,200,500,400];
+% f5.Position = [200,200,500,400];
 
 f6 = figure(6);
 clf
@@ -172,7 +174,7 @@ xlabel('Axial Distance (m)')
 ylabel('heat')
 legend('h_{chg}','h_{rhg}')
 grid on
-f6.Position = [200,200,500,400];
+% f6.Position = [200,200,500,400];
 
 f7 = figure(7);
 clf
@@ -190,7 +192,7 @@ xlabel('Axial Distance (m)')
 ylabel('Stress (ksi)')
 legend('Total inner wall stress','Inner Wall Yield','Total outer wall stress','Outer Wall Yield')
 grid on
-f7.Position = [200,200,500,400];
+% f7.Position = [200,200,500,400];
 
 f8 = figure(8);
 clf
@@ -210,4 +212,4 @@ ylabel('Feature Size (m)')
 ylim([0,0.004])
 legend('Channel Width','Channel Height','Rib Width','Inner Wall Thickness','Outer Wall Thickness')
 grid on
-f8.Position = [200,200,600,400];
+% f8.Position = [200,200,600,400];
