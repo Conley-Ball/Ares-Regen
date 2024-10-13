@@ -1,4 +1,4 @@
-function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2,v_c] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,w_rib,num,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch)
+function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2,T_cw,T_rw] = heatTransfer2DTC(Pc,M,A,D,D_h,w_ch,w_rib,num,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_reslnution,h_ch,phi)
     % Preallocation
     T_c = zeros(1,length(pos));
     P_c = zeros(1,length(pos));
@@ -21,13 +21,13 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
     T_c(1) = T_inlet;
     pgs = 0;
     tol = 6895;
-    errorP = -1.2*tol+1;
+    errorP = -1.5*tol+1;
     P_c(1) = Pc*(1+stiffness);
     while abs(errorP) > tol
         P_c = [P_c(1)-errorP zeros(1,length(pos)-1)];
         for i=1:length(pos)
                 %% Coolant Properties
-                [rho_c,T_sat_c(i),P_sat_c,mu_c,k_c,Cp_c,st_c,v_c(i),D_h(i),rho_c_liquid,rho_c_vapor,h_c_liquid,h_c_vapor] = coolant(T_c(i),P_c(i),ratio,mdot_f,w_ch(i),h_ch(i),num,fillet);
+                [rho_c,T_sat_c(i),P_sat_c,mu_c,k_c,Cp_c,st_c,v_c(i),D_h(i),rho_c_liquid,rho_c_vapor,h_c_liquid,h_c_vapor] = coolant(T_c(i),P_c(i),ratio,mdot_f,w_ch(i),h_ch(i),num,fillet,phi(i));
                 %% Critical Heat Flux
                 q_crit(i) = 0.1003+0.05264*( v_c(i)*3.281 * (T_sat_c(i)-T_c(i))*9/5 )^0.5; %Btu/h/in^2
                 F_p = 1.17-0.000856*P_c(i)/6894.76;
@@ -45,9 +45,10 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                 h_c_l = Nu_c*k_c/D_h(i); % [W/m^2-K];
 
                 h_c_nb = 0.00122*(k_c^0.79*Cp_c^0.45*rho_c*0.49/(st_c^0.5*mu_c^0.29*(h_c_vapor-h_c_liquid)^0.24*rho_c_vapor^0.24));
+                % h_c_nb = 0;
 
                 % Geometry
-                w = w_rib; % m
+                w = w_rib(i); % m
                 b = w_ch(i); % m
                 t = t_ins(i);
                 h = h_ch(i);
@@ -76,27 +77,28 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                 while abs(errorT) > 1
                     r = Pr_g(i)^0.33; % []
                     T_aw = T(i)*((1+r*(gamma(i)-1)/2*M(i)^2)/(1+(gamma(i)-1)/2*M(i)^2)); % K
-                    eq = @(T_w) solveFunction(T_w,w,b,t,t_r,d,d_r,h,l,T_aw,M(i),T(i),A(i),gamma(i),Cp_g(i),mu_g(i),Pr_g(i),Pc,C_star,C_star_eff,D_t,R,A_t,res,T_c(i),kT_chg,kT_rhg,kT_ci,kT_ri,kT_rb,S,h_c_l,h_c_nb,T_sat_c(i),P_sat_c,ratio);
+                    eq = @(T_w) solveFunctionTC(T_w,w,b,t,t_r,d,d_r,h,l,T_aw,M(i),T(i),A(i),gamma(i),Cp_g(i),mu_g(i),Pr_g(i),Pc,C_star,C_star_eff,D_t,R,A_t,res,T_c(i),kT_chg,kT_rhg,kT_ci,kT_ri,kT_rb,S,h_c_l,h_c_nb,T_sat_c(i),P_sat_c,ratio);
                     if i > 1
-                        sol = fsolve(eq,[T_chg(i-1),T_rhg(i-1)],optimset('Display', 'off', 'TolX',1e-4));
+                        sln = fsolve(eq,[T_chg(i-1),T_rhg(i-1)],optimset('Display', 'off', 'TolX',1e-4));
                     else
-                        sol = fsolve(eq,[400,300],optimset('Display', 'off', 'TolX',1e-4));
+                        sln = fsolve(eq,[300,300],optimset('Display', 'off', 'TolX',1e-4));
                     end
                     T_chg_old = T_chg(i);
-                    T_chg(i) = sol(1);
-                    T_rhg(i) = sol(2);
+                    T_chg(i) = sln(1);
+                    T_rhg(i) = sln(2);
                     errorT = T_chg(i) - T_chg_old;
                     deltaT_sat = T_chg(i) - T_sat_c(i);
                     if deltaT_sat > 0
                         if T_chg(i)<275
-                            deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', 275, 'Q', 0, 'water')-py.CoolProp.CoolProp.PropsSI('P', 'T', T_sat_c(i), 'Q', 0, 'water');
-                        elseif T_chg(i)>645
-                            deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', 645, 'Q', 0, 'water')-py.CoolProp.CoolProp.PropsSI('P', 'T', T_sat_c(i), 'Q', 0, 'water');
+                            deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', 275, 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', 275, 'Q', 0, 'ethanol')*ratio-P_sat_c;
+                        elseif T_chg(i)>510
+                            deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', 510, 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', 510, 'Q', 0, 'ethanol')*ratio-P_sat_c;
                         else
-                            deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', T_chg(i), 'Q', 0, 'water')-py.CoolProp.CoolProp.PropsSI('P', 'T', T_sat_c(i), 'Q', 0, 'water');
+                            deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', T_chg(i), 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', T_chg(i), 'Q', 0, 'ethanol')*ratio-P_sat_c;
                         end
-                        h_c_nb = h_c_nb*deltaT_sat^0.24*deltaP_sat^0.75;
-                        h_c(i) = h_c_l + S*h_c_nb*(T_chg(i)-T_sat_c(i))/(T_chg(i)-T_c(i));    
+                        h_c_nb2 = h_c_nb*deltaT_sat^0.24*deltaP_sat^0.75;
+                        h_c_nb2 = 0;
+                        h_c(i) = h_c_l + S*h_c_nb2*(T_chg(i)-T_sat_c(i))/(T_chg(i)-T_c(i));    
                     else
                         h_c(i) = h_c_l;
                     end
@@ -105,12 +107,14 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                     H = (d_r/kT_rb+(w*l)/(2*d*kT_rb)+(w*d_r)/(b*kT_rb)+w/(h_c(i)*b))^-1; % [W/m^2-K]
                     beta = (H/(kT_rb*m)*sinh(m*h)+cosh(m*h))^-1; % []
                     eta = (cosh(m*h)-beta)/sinh(m*h); % []
-                    sigma_c = ( (0.5*(T_chg(i)/T(i))*(1+(gamma(i)-1)/2*M(i)^2)+0.5)^0.68*(1+(gamma(i)-1)/2*M(i)^2)^0.12 )^-1; % []
-                    sigma_r = ( (0.5*(T_rhg(i)/T(i))*(1+(gamma(i)-1)/2*M(i)^2)+0.5)^0.68*(1+(gamma(i)-1)/2*M(i)^2)^0.12 )^-1; % []
+                    sigma_c = ( (0.5*(T_chg(i)/T_aw)*(1+(gamma(i)-1)/2*M(i)^2)+0.5)^0.68*(1+(gamma(i)-1)/2*M(i)^2)^0.12 )^-1; % []
+                    sigma_r = ( (0.5*(T_rhg(i)/T_aw)*(1+(gamma(i)-1)/2*M(i)^2)+0.5)^0.68*(1+(gamma(i)-1)/2*M(i)^2)^0.12 )^-1; % []
                     h_chg(i) = (0.026/(D_t^0.2))*(mu_g(end)^0.2*Cp_g(end)*Pr_g(end)^-0.6)*(Pc/(C_star*C_star_eff))^0.8*(D_t/R)^0.1*(A_t/A(i))^0.9*sigma_c; % [W/m^2-K]
                     h_rhg(i) = (0.026/(D_t^0.2))*(mu_g(end)^0.2*Cp_g(end)*Pr_g(end)^-0.6)*(Pc/(C_star*C_star_eff))^0.8*(D_t/R)^0.1*(A_t/A(i))^0.9*sigma_r; % [W/m^2-K]
-                    T_ci(i) = T_chg(i)-h_chg(i)*t_r/kT_chg*(T_aw-T_chg(i)); % K
-                    T_ri(i) = T_rhg(i)-h_rhg(i)*t_r/kT_rhg*(T_aw-T_rhg(i)); % K
+                    T_cw(i) = T_chg(i) - res*h_chg(i)*(T_aw-T_chg(i));
+                    T_rw(i) = T_rhg(i) - res*h_rhg(i)*(T_aw-T_rhg(i));
+                    T_ci(i) = T_cw(i) - t_r/kT_chg/res*(T_chg(i)-T_cw(i)); % K
+                    T_ri(i) = T_rw(i) - t_r/kT_rhg/res*(T_rhg(i)-T_rw(i)); % KT_cb(i) = (kT_ci/(t-t_r)*T_ci(i)+h_c(i)*T_c(i))/(kT_ci/(t-t_r)+h_c(i)); % K
                     T_cb(i) = (kT_ci/(t-t_r)*T_ci(i)+h_c(i)*T_c(i))/(kT_ci/(t-t_r)+h_c(i)); % K
                     T_rb(i) = (kT_ri/(t-t_r)*T_ri(i)+epsilon*eta*h_c(i)*T_c(i))/(kT_ri/(t-t_r)+epsilon*eta*h_c(i)); % K
                     T_rt(i) = beta*(T_rb(i)-T_c(i)) + T_c(i); % K
@@ -124,9 +128,17 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                     [~,~,~,kT_rb,~,~] = materialProperties(T_rb(i),material);
                     [~,~,~,kT_rt,~,~] = materialProperties(T_rt(i),material);
                 end
-                Q_chg = (T_aw-T_chg(i))/(1/(b*h_chg(i))+res/b); % W/m
-                Q_rhg = (T_aw-T_rhg(i))/(1/(w*h_rhg(i))+res/w); % W/m
+                Q_chg = b*h_chg(i)*(T_aw-T_chg(i)); % W/m
+                Q_rhg = w*h_rhg(i)*(T_aw-T_rhg(i)); % W/m
                 Q_tot = Q_chg + Q_rhg; % W/m
+                if res > 0
+                    T_cw(i) = T_chg(i) - res/b*Q_chg;
+                    % T_cw2(i) = T_aw - Q_chg/(h_chg(i)*b);
+                    T_rw(i) = T_rhg(i) - res/w*Q_rhg;
+                else
+                    T_cw = 0;
+                    T_rw = 0;
+                end
                 q(i) = Q_tot/(b+w); % W/m^2
                 if q < 0
                     error('Negative Heat Flux')

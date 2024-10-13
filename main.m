@@ -20,7 +20,7 @@ Pe =                    10.3; % psia
 Cd =                    0.7;
 
 res =                   0.00005/1; % thermal resistance coating t/k
-%res =                   0;
+% res =                   0;
 C_star_eff =            0.94;
 C_F_eff =               0.99;
 T_inlet =               300; % K
@@ -49,7 +49,11 @@ fprintf('Geometry Finished\n')
 
 fprintf('Heat Transfer       \n')
 ch_resolution = 1e-5; % m
+if res > 0
+[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2,T_cw,T_rw] = heatTransfer2DTC(Pc,M,A,D,D_h,w_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,eth_ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch,phi);
+else
 [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,eth_ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch,phi);
+end
 fprintf('\b\b\b\b\b\b\bFinished\n')
 
 % ===STRESS===
@@ -58,7 +62,10 @@ fprintf('\b\b\b\b\b\b\bFinished\n')
 [E_iw,nu_iw,alpha_iw,k_iw,Cp_iw,Yield_iw] = materialProperties(T_ci,material);
 [E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = materialProperties(T_co,material);
 
-[sigma_s_i,sigma_s_o,sigma_c_r,sigma_t_r,sigma_s_r,sigma_r,sigma_a,sigma_s_i_hydro,sigma_b_i_hydro,sigma_t_r_hydro,sigma_total_inner,sigma_total_outer] = stress_new_2(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,alpha_ow,E_iw,E_ow,nu_iw,nu_ow,h_ch,T_ci,T_co,T_chg,T_cb,T_ct,D_t,num_ch,l_div);
+if res == 0
+    T_cw = T_chg;
+end
+[sigma_s_i,sigma_s_o,sigma_c_r,sigma_t_r,sigma_s_r,sigma_r,sigma_a,sigma_s_i_hydro,sigma_b_i_hydro,sigma_t_r_hydro,sigma_total_inner,sigma_total_outer] = stress_new_2(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,alpha_ow,E_iw,E_ow,nu_iw,nu_ow,h_ch,T_ci,T_co,T_cw,T_cb,T_ct,D_t,num_ch,l_div);
 % Total Inner wall stress only
 %stressTotaliw = stressTiw + stressP_hoop;
 fprintf('Stress Finished\n')
@@ -152,12 +159,16 @@ plot(pos,T_cb,'LineWidth',1)
 plot(pos,T_ci,'LineWidth',1)
 plot(pos,T_ct,'LineWidth',1)
 plot(pos,T_co,'LineWidth',1)
+if res > 0
+plot(pos,T_cw,'LineWidth',1)
+plot(pos,T_rw,'LineWidth',1)
+end
 xline(0, '--', 'Exit','HandleVisibility','off')
 hold off
 title('Hot Wall Temperature')
 xlabel('Axial Distance (m)')
 ylabel('Temperature (K)')
-legend('T_{w}','T_{cb}','T_{ci}','T_{ct}','T_{co}')
+legend('T_{w}','T_{cb}','T_{ci}','T_{ct}','T_{co}','T_{cw}','T_{rw}')
 grid on
 % f5.Position = [200,200,500,400];
 
