@@ -4,7 +4,7 @@ clc; clear; close all;
 
 material =              'inconel (HT)'; % Select from: 'steel' 'aluminum' 'inconel'
 Pc =                    413.7; % psia
-O_F =                   1;
+O_F =                   1.0;
 Thrust =                2000; % lbf
 fos =                   600;
 
@@ -13,7 +13,7 @@ roughness =             9e-6; % m
 stiffness =             0.2;
 L_star =                30; % in
 angle_conv =            40; % deg
-pitch =                 25; % deg
+pitch =                 35; % deg
 throat_only =           true;
 max_angle =             45; % deg
 Pe =                    10.3; % psia
@@ -40,7 +40,7 @@ fprintf('CEA Finished\n')
 
 % ===GEOMETRY===
 
-num_nodes = 500; % Station Resolution
+num_nodes = 200; % Station Resolution
 [A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,A_e,D_e,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div,h_ch,psi,phi,dtheta] = geometry(Thrust,Pc,Pe,mdot,A_t,D_t,A_e,D_e,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes,h_ch,pitch,max_angle,throat_only);
 mdot_f = mdot*1/(1+O_F); %kg/s
 fprintf('Geometry Finished\n')
