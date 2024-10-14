@@ -74,10 +74,19 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                     [~,~,~,kT_rt,~,~] = materialProperties(T_inlet,material);
                 end
                 errorT = 300;
-                while abs(errorT) > 1
+                if i> 1
+                    T_cb_g = T_cb(i-1);
+                else
+                    if T_cb(i) == 0
+                        T_cb_g = 490;
+                    else
+                        T_cb_g = T_cb(i);
+                    end
+                end
+                while abs(errorT) > 1 || abs(errorT_cb) > 5
                     r = Pr_g(i)^0.33; % []
                     T_aw = T(i)*((1+r*(gamma(i)-1)/2*M(i)^2)/(1+(gamma(i)-1)/2*M(i)^2)); % K
-                    eq = @(T_w) solveFunctionTC(T_w,w,b,t,t_r,d,d_r,h,l,T_aw,M(i),T(i),A(i),gamma(i),Cp_g(i),mu_g(i),Pr_g(i),Pc,C_star,C_star_eff,D_t,R,A_t,res,T_c(i),kT_chg,kT_rhg,kT_ci,kT_ri,kT_rb,S,h_c_l,h_c_nb,T_sat_c(i),P_sat_c,ratio);
+                    eq = @(T_w) solveFunctionTC(T_w,w,b,t,t_r,d,d_r,h,l,T_aw,M(i),T(i),A(i),gamma(i),Cp_g(i),mu_g(i),Pr_g(i),Pc,C_star,C_star_eff,D_t,R,A_t,res,T_c(i),kT_chg,kT_rhg,kT_ci,kT_ri,kT_rb,S,h_c_l,h_c_nb,T_sat_c(i),P_sat_c,ratio,T_cb_g);
                     if i > 1
                         sln = fsolve(eq,[T_chg(i-1),T_rhg(i-1)],optimset('Display', 'off', 'TolX',1e-4));
                     else
@@ -87,18 +96,18 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                     T_chg(i) = sln(1);
                     T_rhg(i) = sln(2);
                     errorT = T_chg(i) - T_chg_old;
-                    deltaT_sat = T_chg(i) - T_sat_c(i);
+                    deltaT_sat = T_cb_g - T_sat_c(i);
                     if deltaT_sat > 0
-                        if T_chg(i)<275
+                        if T_cb_g<275
                             deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', 275, 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', 275, 'Q', 0, 'ethanol')*ratio-P_sat_c;
-                        elseif T_chg(i)>510
+                        elseif T_cb_g>510
                             deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', 510, 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', 510, 'Q', 0, 'ethanol')*ratio-P_sat_c;
                         else
-                            deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', T_chg(i), 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', T_chg(i), 'Q', 0, 'ethanol')*ratio-P_sat_c;
+                            deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', T_cb_g, 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', T_cb_g, 'Q', 0, 'ethanol')*ratio-P_sat_c;
                         end
                         h_c_nb2 = h_c_nb*deltaT_sat^0.24*deltaP_sat^0.75;
                         h_c_nb2 = 0;
-                        h_c(i) = h_c_l + S*h_c_nb2*(T_chg(i)-T_sat_c(i))/(T_chg(i)-T_c(i));    
+                        h_c(i) = h_c_l + S*h_c_nb2*(T_cb_g-T_sat_c(i))/(T_cb_g-T_c(i));    
                     else
                         h_c(i) = h_c_l;
                     end
@@ -127,6 +136,8 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                     [~,~,~,kT_ri,~,~] = materialProperties(T_ri(i),material);
                     [~,~,~,kT_rb,~,~] = materialProperties(T_rb(i),material);
                     [~,~,~,kT_rt,~,~] = materialProperties(T_rt(i),material);
+                    errorT_cb = T_cb(i)-T_cb_g;
+                    T_cb_g = T_cb_g + errorT_cb*0.041;
                 end
                 Q_chg = b*h_chg(i)*(T_aw-T_chg(i)); % W/m
                 Q_rhg = w*h_rhg(i)*(T_aw-T_rhg(i)); % W/m

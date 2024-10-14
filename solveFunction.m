@@ -1,15 +1,15 @@
-function F = solveFunction(T_w,w,b,t,t_r,d,d_r,h,l,T_aw,M,T,A,gamma,Cp_g,mu_g,Pr_g,Pc,C_star,C_star_eff,D_t,R,A_t,res,T_c,kT_chg,kT_rhg,kT_ci,kT_ri,kT_rb,S,h_c_l,h_c_nb,T_sat_c,P_sat_c,ratio)
-    deltaT_sat = T_w(1) - T_sat_c;
+function F = solveFunction(T_w,w,b,t,t_r,d,d_r,h,l,T_aw,M,T,A,gamma,Cp_g,mu_g,Pr_g,Pc,C_star,C_star_eff,D_t,R,A_t,res,T_c,kT_chg,kT_rhg,kT_ci,kT_ri,kT_rb,S,h_c_l,h_c_nb,T_sat_c,P_sat_c,ratio,T_cb_g)
+    deltaT_sat = T_cb_g - T_sat_c;
     if deltaT_sat > 0
-        if T_w(1)<275
+        if T_cb_g<275
             deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', 275, 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', 275, 'Q', 0, 'ethanol')*ratio-P_sat_c;
-        elseif T_w(1)>510
+        elseif T_cb_g>510
             deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', 510, 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', 510, 'Q', 0, 'ethanol')*ratio-P_sat_c;
         else
-            deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', T_w(1), 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', T_w(1), 'Q', 0, 'ethanol')*ratio-P_sat_c;
+            deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', T_cb_g, 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', T_cb_g, 'Q', 0, 'ethanol')*ratio-P_sat_c;
         end
         h_c_nb = h_c_nb*deltaT_sat^0.24*deltaP_sat^0.75;
-        h_c = h_c_l + S*h_c_nb*(T_w(1)-T_sat_c)/(T_w(1)-T_c);    
+        h_c = h_c_l + S*h_c_nb*(T_cb_g-T_sat_c)/(T_cb_g-T_c);    
     else
         h_c = h_c_l;
     end
