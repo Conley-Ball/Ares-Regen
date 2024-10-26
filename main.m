@@ -2,14 +2,14 @@ clc; clear; close all;
 
 % ===INPUTS===
 
-material =              'inconel (HT)'; % Select from: 'steel' 'aluminum' 'inconel'
-Pc =                    413.7; % psia
-O_F =                   1.0;
+material =              'aluminum'; % Select from: 'steel' 'aluminum' 'inconel'
+Pc =                    313.7; % psia
+O_F =                   1;
 Thrust =                2000; % lbf
 fos =                   600;
 
 
-roughness =             9e-6; % m
+roughness =             19e-6; % m
 stiffness =             0.2;
 L_star =                30; % in
 angle_conv =            40; % deg
@@ -24,23 +24,25 @@ res =                   0.00005/1; % thermal resistance coating t/k
 C_star_eff =            0.94;
 C_F_eff =               0.99;
 T_inlet =               300; % K
+T_CEA_f =               370; % K
+T_initial =             300; % K
 eth_ratio =             0.75;
 
-h_ch =                  [0.0015 0.00075 0.001 0.00125]/0.0254;  % higher raises Q, lower lowers Q
-w_ch_min =              0.0015/0.0254;                      % higher raises Q, lower lowers Q
-w_rib =                 [0.00075 0.0015 0.00075 0.00075]/0.0254;                      
-t_ins =                 [0.00135 0.0005 0.00075 0.0015]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
-t_out =                 [0.0015 0.0015 0.0015 0.0015]/0.0254; % in
+h_ch =                  [0.001 0.001 0.001 0.001]/0.0254;  % higher raises Q, lower lowers Q
+w_ch_min =              0.001/0.0254;                      % higher raises Q, lower lowers Q
+w_rib =                 [0.001 0.002 0.0015 0.0015]/0.0254;                      
+t_ins =                 [0.002 0.0015 0.0015 0.0015]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
+t_out =                 [0.002 0.002 0.002 0.002]/0.0254; % in
 fillet =                0.000250; % m radius
 
 % ===CEA===
 
-[mdot,A_t,D_t,A_e,D_e,C_star,C_F,gamma,MW_g,Cp_g,mu_g,k_g,T_thr,Pr_g] = sizing(Pc,Pe,O_F,eth_ratio,T_inlet,Thrust,C_star_eff,C_F_eff);
+[mdot,A_t,D_t,A_e,D_e,C_star,C_F,gamma,MW_g,Cp_g,mu_g,k_g,T_thr,Pr_g] = sizing(Pc,Pe,O_F,eth_ratio,T_inlet,Thrust,C_star_eff,C_F_eff,T_CEA_f);
 fprintf('CEA Finished\n')
 
 % ===GEOMETRY===
 
-num_nodes = 500; % Station Resolution
+num_nodes = 600; % Station Resolution
 [A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,A_e,D_e,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div,h_ch,psi,phi,dtheta] = geometry(Thrust,Pc,Pe,mdot,A_t,D_t,A_e,D_e,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes,h_ch,pitch,max_angle,throat_only);
 mdot_f = mdot*1/(1+O_F); %kg/s
 fprintf('Geometry Finished\n')
@@ -61,11 +63,12 @@ fprintf('\b\b\b\b\b\b\bFinished\n')
 % Temperature Dependent Material properties
 [E_iw,nu_iw,alpha_iw,k_iw,Cp_iw,Yield_iw] = materialProperties(T_ci,material);
 [E_ow,nu_ow,alpha_ow,k_ow,Cp_ow,Yield_ow] = materialProperties(T_co,material);
+[E_hydro,nu_hydro,alpha_hydro,k_hydro,Cp_hydro,Yield_hydro] = materialProperties(T_initial*ones(size(pos)),material);
 
 if res == 0
     T_cw = T_chg;
 end
-[sigma_s_i,sigma_s_o,sigma_c_r,sigma_t_r,sigma_s_r,sigma_r,sigma_a,sigma_s_i_hydro,sigma_b_i_hydro,sigma_t_r_hydro,sigma_total_inner,sigma_total_outer] = stress_new_2(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,alpha_ow,E_iw,E_ow,nu_iw,nu_ow,h_ch,T_ci,T_co,T_cw,T_cb,T_ct,D_t,num_ch,l_div);
+[sigma_s_i,sigma_s_o,sigma_c_r,sigma_t_r,sigma_s_r,sigma_r,sigma_a,sigma_s_i_hydro,sigma_b_i_hydro,sigma_t_r_hydro,sigma_total_inner,sigma_total_outer,sigma_h_i_hydro,sigma_h_o_hydro] = stress(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,alpha_ow,E_iw,E_ow,nu_iw,nu_ow,h_ch,T_ci,T_co,T_cw,T_cb,T_ct,D_t,num_ch,l_div);
 % Total Inner wall stress only
 %stressTotaliw = stressTiw + stressP_hoop;
 fprintf('Stress Finished\n')
@@ -226,3 +229,23 @@ ylim([0,0.004])
 legend('Channel Width','Channel Height','Rib Width','Inner Wall Thickness','Outer Wall Thickness')
 grid on
 % f8.Position = [200,200,600,400];
+
+f10 = figure(10);
+clf
+hold on
+xline(pos(id_th), '--', 'Throat','HandleVisibility','off')
+xline(pos(id_c), '--', 'Chamber','HandleVisibility','off')
+plot(pos,sigma_h_i_hydro/6895000,'LineWidth',1,'DisplayName','Hydrostatic Inner Hoop')
+plot(pos,sigma_h_o_hydro/6895000,'LineWidth',1,'DisplayName','Hydrostatic Outer Hoop')
+plot(pos,sigma_s_i_hydro/6895000,'LineWidth',1,'DisplayName','Hydrostatic Inner Shear')
+plot(pos,sigma_b_i_hydro/6895000,'LineWidth',1,'DisplayName','Hydrostatic Inner Bending')
+plot(pos,sigma_t_r_hydro/6895000,'LineWidth',1,'DisplayName','Hydrostatic Rib Tensile')
+plot(pos,Yield_hydro/6895000, '--','LineWidth',1,'DisplayName','Hydrostatic Yield')
+xline(0, '--', 'Exit','HandleVisibility','off')
+hold off
+title('Hydrostatic Stress')
+xlabel('Axial Distance (m)')
+ylabel('Stress (ksi)')
+legend()
+grid on
+
