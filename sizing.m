@@ -1,4 +1,4 @@
-function [mdot,A_t,D_t,A_e,D_e,C_star,C_F,gamma,MW_g,Cp_g,mu_g,k_g,T_thr,Pr_g] = sizing(Pc,Pe,OF,eth_ratio,T_inlet,Thrust,C_star_eff,C_F_eff)
+function [mdot,A_t,D_t,A_e,D_e,C_star,C_F,gamma,MW_g,Cp_g,mu_g,k_g,T_thr,Pr_g] = sizing(Pc,Pe,OF,eth_ratio,T_inlet,Thrust,C_star_eff,C_F_eff,T_CEA_f)
     % Initial Guess
     mdot = 1;
     A_e = 1;
@@ -6,7 +6,7 @@ function [mdot,A_t,D_t,A_e,D_e,C_star,C_F,gamma,MW_g,Cp_g,mu_g,k_g,T_thr,Pr_g] =
     error = 1;
     % CEA Convergence
     while error > 1e-2
-        RKT1=CEA('problem','rocket','equilibrium','fac','ma,kg/s',mdot,'o/f',OF,'p(psi)',Pc,'pi/p',Pc/Pe,'supsonic(ae/at)',A_e/A_t,'reactants','fuel','C2H5OH(L)','wt%',eth_ratio*100,'t(k)',T_inlet,'fuel','H2O(L)','wt%',(1-eth_ratio)*100,'t(k)',T_inlet,'oxid','O2(L)','wt%',100,'t(k)',90.0,'output','transport','mks','end');
+        RKT1=CEA('problem','rocket','equilibrium','fac','ma,kg/s',mdot,'o/f',OF,'p(psi)',Pc,'pi/p',Pc/Pe,'supsonic(ae/at)',A_e/A_t,'reactants','fuel','C2H5OH(L)','wt%',eth_ratio*100,'t(k)',T_CEA_f,'fuel','H2O(L)','wt%',(1-eth_ratio)*100,'t(k)',T_CEA_f,'oxid','O2(L)','wt%',100,'t(k)',90.0,'output','transport','mks','end');
         C_star = RKT1.output.eql.cstar(1);
         C_F = RKT1.output.eql.cf(end);
         gamma = RKT1.output.eql.gamma(end);
