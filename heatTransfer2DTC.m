@@ -1,4 +1,4 @@
-function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2,T_cw,T_rw] = heatTransfer2DTC(Pc,M,A,D,D_h,w_ch,w_rib,num,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_reslnution,h_ch,phi)
+function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2,T_cw,T_rw,T_aw,h_c] = heatTransfer2DTC(Pc,M,A,D,D_h,w_ch,w_rib,num,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_reslnution,h_ch,phi)
     % Preallocation
     T_c = zeros(1,length(pos));
     P_c = zeros(1,length(pos));
@@ -16,6 +16,7 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
     T_ct = zeros(1,length(pos));
     T_chg = zeros(1,length(pos));
     T_rhg = zeros(1,length(pos));
+    T_aw = zeros(1,length(pos));
     q = zeros(1,length(pos));
     step = [step 1];
     T_c(1) = T_inlet;
@@ -85,8 +86,8 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                 end
                 while abs(errorT) > 1 || abs(errorT_cb) > 5
                     r = Pr_g(i)^0.33; % []
-                    T_aw = T(i)*((1+r*(gamma(i)-1)/2*M(i)^2)/(1+(gamma(i)-1)/2*M(i)^2)); % K
-                    eq = @(T_w) solveFunctionTC(T_w,w,b,t,t_r,d,d_r,h,l,T_aw,M(i),T(i),A(i),gamma(i),Cp_g(i),mu_g(i),Pr_g(i),Pc,C_star,C_star_eff,D_t,R,A_t,res,T_c(i),kT_chg,kT_rhg,kT_ci,kT_ri,kT_rb,S,h_c_l,h_c_nb,T_sat_c(i),P_sat_c,ratio,T_cb_g);
+                    T_aw(i) = T(i)*((1+r*(gamma(i)-1)/2*M(i)^2)/(1+(gamma(i)-1)/2*M(i)^2)); % K
+                    eq = @(T_w) solveFunctionTC(T_w,w,b,t,t_r,d,d_r,h,l,T_aw(i),M(i),T(i),A(i),gamma(i),Cp_g(i),mu_g(i),Pr_g(i),Pc,C_star,C_star_eff,D_t,R,A_t,res,T_c(i),kT_chg,kT_rhg,kT_ci,kT_ri,kT_rb,S,h_c_l,h_c_nb,T_sat_c(i),P_sat_c,ratio,T_cb_g);
                     if i > 1
                         sln = fsolve(eq,[T_chg(i-1),T_rhg(i-1)],optimset('Display', 'off', 'TolX',1e-4));
                     else
@@ -116,12 +117,12 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                     H = (d_r/kT_rb+(w*l)/(2*d*kT_rb)+(w*d_r)/(b*kT_rb)+w/(h_c(i)*b))^-1; % [W/m^2-K]
                     beta = (H/(kT_rb*m)*sinh(m*h)+cosh(m*h))^-1; % []
                     eta = (cosh(m*h)-beta)/sinh(m*h); % []
-                    sigma_c = ( (0.5*(T_chg(i)/T_aw)*(1+(gamma(i)-1)/2*M(i)^2)+0.5)^0.68*(1+(gamma(i)-1)/2*M(i)^2)^0.12 )^-1; % []
-                    sigma_r = ( (0.5*(T_rhg(i)/T_aw)*(1+(gamma(i)-1)/2*M(i)^2)+0.5)^0.68*(1+(gamma(i)-1)/2*M(i)^2)^0.12 )^-1; % []
+                    sigma_c = ( (0.5*(T_chg(i)/T_aw(i))*(1+(gamma(i)-1)/2*M(i)^2)+0.5)^0.68*(1+(gamma(i)-1)/2*M(i)^2)^0.12 )^-1; % []
+                    sigma_r = ( (0.5*(T_rhg(i)/T_aw(i))*(1+(gamma(i)-1)/2*M(i)^2)+0.5)^0.68*(1+(gamma(i)-1)/2*M(i)^2)^0.12 )^-1; % []
                     h_chg(i) = (0.026/(D_t^0.2))*(mu_g(end)^0.2*Cp_g(end)*Pr_g(end)^-0.6)*(Pc/(C_star*C_star_eff))^0.8*(D_t/R)^0.1*(A_t/A(i))^0.9*sigma_c; % [W/m^2-K]
                     h_rhg(i) = (0.026/(D_t^0.2))*(mu_g(end)^0.2*Cp_g(end)*Pr_g(end)^-0.6)*(Pc/(C_star*C_star_eff))^0.8*(D_t/R)^0.1*(A_t/A(i))^0.9*sigma_r; % [W/m^2-K]
-                    T_cw(i) = T_chg(i) - res*h_chg(i)*(T_aw-T_chg(i));
-                    T_rw(i) = T_rhg(i) - res*h_rhg(i)*(T_aw-T_rhg(i));
+                    T_cw(i) = T_chg(i) - res*h_chg(i)*(T_aw(i)-T_chg(i));
+                    T_rw(i) = T_rhg(i) - res*h_rhg(i)*(T_aw(i)-T_rhg(i));
                     T_ci(i) = T_cw(i) - t_r/kT_chg/res*(T_chg(i)-T_cw(i)); % K
                     T_ri(i) = T_rw(i) - t_r/kT_rhg/res*(T_rhg(i)-T_rw(i)); % KT_cb(i) = (kT_ci/(t-t_r)*T_ci(i)+h_c(i)*T_c(i))/(kT_ci/(t-t_r)+h_c(i)); % K
                     T_cb(i) = (kT_ci/(t-t_r)*T_ci(i)+h_c(i)*T_c(i))/(kT_ci/(t-t_r)+h_c(i)); % K
@@ -139,12 +140,12 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                     errorT_cb = T_cb(i)-T_cb_g;
                     T_cb_g = T_cb_g + errorT_cb*0.041;
                 end
-                Q_chg = b*h_chg(i)*(T_aw-T_chg(i)); % W/m
-                Q_rhg = w*h_rhg(i)*(T_aw-T_rhg(i)); % W/m
+                Q_chg = b*h_chg(i)*(T_aw(i)-T_chg(i)); % W/m
+                Q_rhg = w*h_rhg(i)*(T_aw(i)-T_rhg(i)); % W/m
                 Q_tot = Q_chg + Q_rhg; % W/m
                 if res > 0
                     T_cw(i) = T_chg(i) - res/b*Q_chg;
-                    % T_cw2(i) = T_aw - Q_chg/(h_chg(i)*b);
+                    % T_cw2(i) = T_aw(i) - Q_chg/(h_chg(i)*b);
                     T_rw(i) = T_rhg(i) - res/w*Q_rhg;
                 else
                     T_cw = 0;
