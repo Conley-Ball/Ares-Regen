@@ -14,7 +14,7 @@ stiffness =             0.2;
 L_star =                30; % in
 angle_conv =            40; % deg
 pitch =                 0; % deg
-throat_only =           true;
+throat_only =           false;
 max_angle =             45; % deg
 Pe =                    10.3; % psia
 Cd =                    0.7;
@@ -24,15 +24,15 @@ res =                   0.00005/1; % thermal resistance coating t/k
 C_star_eff =            0.94;
 C_F_eff =               0.99;
 T_inlet =               300; % K
-T_CEA_f =               370; % K
+T_CEA_f =               390; % K
 T_initial =             300; % K
 eth_ratio =             0.75;
 
 h_ch =                  [0.001 0.001 0.001 0.001]/0.0254;  % higher raises Q, lower lowers Q
 w_ch_min =              0.001/0.0254;                      % higher raises Q, lower lowers Q
-w_rib =                 [0.001 0.002 0.0015 0.0015]/0.0254;                      
-t_ins =                 [0.002 0.0015 0.0015 0.0015]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
-t_out =                 [0.002 0.002 0.002 0.002]/0.0254; % in
+w_rib =                 [0.0015 0.0018 0.0015 0.0015]/0.0254;                      
+t_ins =                 [0.003 0.0013 0.0015 0.00175]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
+t_out =                 [0.003 0.002 0.002 0.0015]/0.0254; % in
 fillet =                0.000250; % m radius
 
 % ===CEA===
@@ -52,7 +52,7 @@ fprintf('Geometry Finished\n')
 fprintf('Heat Transfer       \n')
 ch_resolution = 1e-5; % m
 if res > 0
-[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2,T_cw,T_rw] = heatTransfer2DTC(Pc,M,A,D,D_h,w_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,eth_ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch,phi);
+[T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2,T_cw,T_rw,T_aw,h_c] = heatTransfer2DTC(Pc,M,A,D,D_h,w_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,eth_ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch,phi);
 else
 [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,h_chg,h_rhg,h_ch,t_ins,q_crit,q_crit2] = heatTransfer2D(Pc,M,A,D,D_h,w_ch,w_rib,num_ch,t_ins,t_out,step,pos,gamma,mu_g,Cp_g,Pr_g,C_star,T,D_t,A_t,T_inlet,eth_ratio,mdot_f,C_star_eff,res,num_ch,l_div,fos,P,fillet,stiffness,material,roughness,ch_resolution,h_ch,phi);
 end
@@ -249,3 +249,10 @@ ylabel('Stress (ksi)')
 legend()
 grid on
 
+%ANSYS Data
+% Data_h_chg = [pos(:), h_chg(:)];
+% Data_T_aw = [pos(:), T_aw(:)];
+% Data_h_c = [pos(:), h_c(:)];
+% Data_T_c = [pos(:), T_c(:)];
+Data_P = [pos(:), P(:)];
+Data_P_c = [pos(:), P_c(:)];
