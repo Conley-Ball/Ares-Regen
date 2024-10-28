@@ -46,11 +46,16 @@ function [E,nu,alpha,k,Cp,Yield] = materialProperties(T,material)
         823	1326];
         
         % Yield Strength [Pa]
-        Yield_table = [298	251000000;
-        373	232000000;
-        423	221000000;
-        473	197000000;
-        523	148000000];
+        % Yield_table = [298	251000000;
+        % 373	232000000;
+        % 423	221000000;
+        % 473	197000000;
+        % 523	148000000];
+        Yield_table = [298	1.862e+8;
+        373	0.9243*1.862e+8;
+        423	0.8805*1.862e+8;
+        473	0.7849*1.862e+8;
+        523	0.5896*1.862e+8];
     elseif strcmp(material,'steel') % Steel174ph
         % Elastic modulous [Pa]
         E_table = [298	204000000000;
