@@ -4,7 +4,7 @@ clc; clear; close all;
 
 material =              'aluminum'; % Select from: 'steel' 'aluminum' 'inconel'
 Pc =                    313.7; % psia
-O_F =                   1;
+O_F =                   0.9;
 Thrust =                2000; % lbf
 fos =                   600;
 
@@ -28,10 +28,10 @@ T_CEA_f =               390; % K
 T_initial =             300; % K
 eth_ratio =             0.75;
 
-h_ch =                  [0.001 0.001 0.001 0.001]/0.0254;  % higher raises Q, lower lowers Q
+h_ch =                  [0.0015 0.001 0.0015 0.0015]/0.0254;  % higher raises Q, lower lowers Q
 w_ch_min =              0.001/0.0254;                      % higher raises Q, lower lowers Q
-w_rib =                 [0.0015 0.0018 0.0015 0.0015]/0.0254;                      
-t_ins =                 [0.003 0.0013 0.0015 0.00175]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
+w_rib =                 [0.001 0.001 0.001 0.001]/0.0254;                      
+t_ins =                 [0.003 0.001 0.0013 0.00175]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
 t_out =                 [0.003 0.002 0.002 0.0015]/0.0254; % in
 fillet =                0.000250; % m radius
 
@@ -42,7 +42,7 @@ fprintf('CEA Finished\n')
 
 % ===GEOMETRY===
 
-num_nodes = 600; % Station Resolution
+num_nodes = 1500; % Station Resolution
 [A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,A_e,D_e,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div,h_ch,psi,phi,dtheta] = geometry(Thrust,Pc,Pe,mdot,A_t,D_t,A_e,D_e,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes,h_ch,pitch,max_angle,throat_only);
 mdot_f = mdot*1/(1+O_F); %kg/s
 fprintf('Geometry Finished\n')
@@ -250,9 +250,9 @@ legend()
 grid on
 
 %ANSYS Data
-% Data_h_chg = [pos(:), h_chg(:)];
-% Data_T_aw = [pos(:), T_aw(:)];
-% Data_h_c = [pos(:), h_c(:)];
-% Data_T_c = [pos(:), T_c(:)];
-% Data_P = [pos(:), P(:)];
-% Data_P_c = [pos(:), P_c(:)];
+Data_h_chg = [pos(:), h_chg(:)];
+Data_T_aw = [pos(:), T_aw(:)];
+Data_h_c = [pos(:), h_c(:)];
+Data_T_c = [pos(:), T_c(:)];
+Data_P = [pos(:), P(:)];
+Data_P_c = [pos(:), P_c(:)];
