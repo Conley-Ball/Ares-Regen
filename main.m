@@ -3,7 +3,7 @@ clc; clear; close all;
 % ===INPUTS===
 
 material =              'aluminum'; % Select from: 'steel' 'aluminum' 'inconel'
-Pc =                    288.7000; % psia
+Pc =                    313.7000; % psia
 %% 
 O_F =                   0.85;
 Thrust =                2000; % lbf
@@ -12,12 +12,12 @@ fos =                   600;
 
 roughness =             19e-6; % m
 stiffness =             0.2;
-L_star =                30; % in
+L_star =                27.5; % in
 angle_conv =            40; % deg
 pitch =                 0; % deg
 throat_only =           false;
 max_angle =             45; % deg
-Pe =                    10.3; % psia
+Pe =                    13.7; % psia
 Cd =                    0.7;
 
 res =                   0.00005/1; % thermal resistance coating t/k
