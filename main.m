@@ -29,12 +29,12 @@ T_CEA_f =               370; % K
 T_initial =             300; % K
 eth_ratio =             0.75;
 
-h_ch =                  [0.001 0.001 0.001 0.00125]/0.0254;  % higher raises Q, lower lowers Q
+h_ch =                  [0.002 0.001 0.001 0.00125]/0.0254;  % higher raises Q, lower lowers Q
 w_ch_min =              0.001/0.0254;                      % higher raises Q, lower lowers Q
 w_rib =                 [0.001 0.001 0.001 0.001]/0.0254;                      
-t_ins =                 [0.0025 0.001 0.0013 0.0015]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
-t_out =                 [0.003 0.002 0.002 0.0015]/0.0254; % in
-fillet =                0.000250; % m radius
+t_ins =                 [0.002 0.001 0.0013 0.0015]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
+t_out =                 [0.002 0.0015 0.0015 0.0015]/0.0254; % in
+fillet =                0.0001250; % m radius
 
 
 
