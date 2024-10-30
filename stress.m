@@ -1,4 +1,4 @@
-function [sigma_s_i,sigma_s_o,sigma_c_r,sigma_t_r,sigma_s_r,sigma_r,sigma_a,sigma_s_i_hydro,sigma_b_i_hydro,sigma_t_r_hydro,sigma_total_inner,sigma_total_outer,sigma_h_i_hydro,sigma_h_o_hydro] = stress(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,alpha_ow,E_iw,E_ow,nu_iw,nu_ow,h_ch,T_ci,T_co,T_chg,T_cb,T_ct,D_t,num_ch,l_div)
+function [sigma_s_i,sigma_s_o,sigma_c_r,sigma_t_r,sigma_s_r,sigma_r,sigma_a,sigma_s_i_hydro,sigma_b_i_hydro,sigma_t_r_hydro,sigma_total_inner,sigma_total_outer,sigma_h_i_hydro,sigma_h_o_hydro,sigma_h_i,sigma_phi_i] = stress(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,alpha_ow,E_iw,E_ow,nu_iw,nu_ow,h_ch,T_ci,T_co,T_chg,T_cb,T_ct,D_t,num_ch,l_div)
 sigma_h_i = zeros(1,length(pos));
 sigma_b_i = zeros(1,length(pos));
 sigma_phi_i = zeros(1,length(pos));

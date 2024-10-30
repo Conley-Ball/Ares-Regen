@@ -107,7 +107,7 @@ function [T_c,T_sat_c,P_c,q,T_chg,T_rhg,T_ci,T_ri,T_cb,T_rb,T_rt,T_ro,T_co,T_ct,
                             deltaP_sat = py.CoolProp.CoolProp.PropsSI('P', 'T', T_cb_g, 'Q', 0, 'water')*(1-ratio)+py.CoolProp.CoolProp.PropsSI('P', 'T', T_cb_g, 'Q', 0, 'ethanol')*ratio-P_sat_c;
                         end
                         h_c_nb2 = h_c_nb*deltaT_sat^0.24*deltaP_sat^0.75;
-                        h_c_nb2 = 0;
+                        % h_c_nb2 = 0;
                         h_c(i) = h_c_l + S*h_c_nb2*(T_cb_g-T_sat_c(i))/(T_cb_g-T_c(i));    
                     else
                         h_c(i) = h_c_l;

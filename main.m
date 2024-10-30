@@ -3,8 +3,9 @@ clc; clear; close all;
 % ===INPUTS===
 
 material =              'aluminum'; % Select from: 'steel' 'aluminum' 'inconel'
-Pc =                    313.7; % psia
-O_F =                   0.9;
+Pc =                    288.7000; % psia
+%% 
+O_F =                   0.85;
 Thrust =                2000; % lbf
 fos =                   600;
 
@@ -24,16 +25,18 @@ res =                   0.00005/1; % thermal resistance coating t/k
 C_star_eff =            0.94;
 C_F_eff =               0.99;
 T_inlet =               300; % K
-T_CEA_f =               390; % K
+T_CEA_f =               370; % K
 T_initial =             300; % K
 eth_ratio =             0.75;
 
-h_ch =                  [0.0015 0.001 0.0015 0.0015]/0.0254;  % higher raises Q, lower lowers Q
+h_ch =                  [0.001 0.001 0.001 0.00125]/0.0254;  % higher raises Q, lower lowers Q
 w_ch_min =              0.001/0.0254;                      % higher raises Q, lower lowers Q
 w_rib =                 [0.001 0.001 0.001 0.001]/0.0254;                      
-t_ins =                 [0.003 0.001 0.0013 0.00175]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
+t_ins =                 [0.0025 0.001 0.0013 0.0015]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
 t_out =                 [0.003 0.002 0.002 0.0015]/0.0254; % in
 fillet =                0.000250; % m radius
+
+
 
 % ===CEA===
 
@@ -42,7 +45,7 @@ fprintf('CEA Finished\n')
 
 % ===GEOMETRY===
 
-num_nodes = 1500; % Station Resolution
+num_nodes = 800; % Station Resolution
 [A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,A_e,D_e,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div,h_ch,psi,phi,dtheta] = geometry(Thrust,Pc,Pe,mdot,A_t,D_t,A_e,D_e,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes,h_ch,pitch,max_angle,throat_only);
 mdot_f = mdot*1/(1+O_F); %kg/s
 fprintf('Geometry Finished\n')
@@ -68,7 +71,7 @@ fprintf('\b\b\b\b\b\b\bFinished\n')
 if res == 0
     T_cw = T_chg;
 end
-[sigma_s_i,sigma_s_o,sigma_c_r,sigma_t_r,sigma_s_r,sigma_r,sigma_a,sigma_s_i_hydro,sigma_b_i_hydro,sigma_t_r_hydro,sigma_total_inner,sigma_total_outer,sigma_h_i_hydro,sigma_h_o_hydro] = stress(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,alpha_ow,E_iw,E_ow,nu_iw,nu_ow,h_ch,T_ci,T_co,T_cw,T_cb,T_ct,D_t,num_ch,l_div);
+[sigma_s_i,sigma_s_o,sigma_c_r,sigma_t_r,sigma_s_r,sigma_r,sigma_a,sigma_s_i_hydro,sigma_b_i_hydro,sigma_t_r_hydro,sigma_total_inner,sigma_total_outer,sigma_h_i_hydro,sigma_h_o_hydro,sigma_h_i,sigma_phi_i] = stress(P_c,P,w_ch,t_ins,w_rib,D,t_out,pos,alpha_iw,alpha_ow,E_iw,E_ow,nu_iw,nu_ow,h_ch,T_ci,T_co,T_cw,T_cb,T_ct,D_t,num_ch,l_div);
 % Total Inner wall stress only
 %stressTotaliw = stressTiw + stressP_hoop;
 fprintf('Stress Finished\n')
@@ -248,6 +251,26 @@ xlabel('Axial Distance (m)')
 ylabel('Stress (ksi)')
 legend()
 grid on
+
+
+f11 = figure(11);
+clf
+hold on
+xline(pos(id_th), '--', 'Throat','HandleVisibility','off')
+xline(pos(id_c), '--', 'Chamber','HandleVisibility','off')
+plot(pos,sigma_total_inner/6895000,'LineWidth',1)
+plot(pos,sigma_h_i/6895000,'LineWidth',1)
+plot(pos,sigma_phi_i/6895000,'LineWidth',1)
+plot(pos,Yield_iw/6895000,'--','LineWidth',1)
+xline(0, '--', 'Exit','HandleVisibility','off')
+hold off
+title('Inner wall Stress')
+xlabel('Axial Distance (m)')
+ylabel('Stress (ksi)')
+legend('Total inner wall stress','Inner wall hoop','Inner wall thermal','Yield inner wall')
+grid on
+
+
 
 %ANSYS Data
 Data_h_chg = [pos(:), h_chg(:)];
