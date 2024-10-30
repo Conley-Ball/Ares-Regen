@@ -12,7 +12,7 @@ fos =                   600;
 
 roughness =             19e-6; % m
 stiffness =             0.2;
-L_star =                27.5; % in
+L_star =                25; % in
 angle_conv =            40; % deg
 pitch =                 0; % deg
 throat_only =           false;
@@ -34,7 +34,7 @@ w_ch_min =              0.001/0.0254;                      % higher raises Q, lo
 w_rib =                 [0.001 0.001 0.001 0.001]/0.0254;                      
 t_ins =                 [0.002 0.001 0.0013 0.0015]/0.0254;  % higher lowers Q, lower raises Q (and lowers FOS)
 t_out =                 [0.002 0.0015 0.0015 0.0015]/0.0254; % in
-fillet =                0.0001250; % m radius
+fillet =                0.00025; % m radius
 
 
 
@@ -45,7 +45,7 @@ fprintf('CEA Finished\n')
 
 % ===GEOMETRY===
 
-num_nodes = 800; % Station Resolution
+num_nodes = 1500; % Station Resolution
 [A,D,M,P,T,w_ch,D_h,w_rib,num_ch,t_ins,t_out,step,pos,D_t,A_t,Pc,Pe,mdot,A_e,D_e,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,id_th,id_c,l_div,h_ch,psi,phi,dtheta] = geometry(Thrust,Pc,Pe,mdot,A_t,D_t,A_e,D_e,C_star,C_star_eff,C_F,C_F_eff,L_star,angle_conv,w_rib,w_ch_min,MW_g,gamma,mu_g,Cp_g,k_g,Pr_g,t_ins,t_out,T_thr,num_nodes,h_ch,pitch,max_angle,throat_only);
 mdot_f = mdot*1/(1+O_F); %kg/s
 fprintf('Geometry Finished\n')
