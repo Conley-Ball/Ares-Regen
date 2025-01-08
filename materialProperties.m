@@ -1,4 +1,4 @@
-function [E,nu,alpha,k,Cp,Yield] = materialProperties(T,material)
+function [k,E,nu,alpha,Cp,Yield] = materialProperties(T,material)
     if strcmp(material,'aluminum') % AlSi10Mg 
         % Elastic modulous [Pa]
         E_table = [298	76600000000;
