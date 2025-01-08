@@ -160,7 +160,7 @@ end
 
 % Initial coolant pressure is adjusted so that the final pressure matches
 % chamber pressure, and the loop is run once more.
-Coolant.total_pressure(1) = Coolant.total_pressure(1) + Parameter.chamber_pressure - Coolant.total_pressure(end);
+Coolant.total_pressure(1) = Coolant.total_pressure(1) + 1.2*Parameter.chamber_pressure - Coolant.total_pressure(end);
 
 % Progress update.
 fprintf('.');

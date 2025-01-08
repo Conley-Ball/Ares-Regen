@@ -12,7 +12,7 @@ function [Parameter,Geometry,Gas] = runCEA(Parameter,Geometry)
 
 if Parameter.design == false
     % CEAM is run using CEA.p, outputs are stored in struct RKT1.
-    RKT1=CEA('problem','rocket','equilibrium','fac','ma,kg/s',Parameter.mass_flow,'o/f',Parameter.O_F_ratio,'p(psi)',Parameter.chamber_pressure,'pi/p',Parameter.chamber_pressure/Parameter.ambient_pressure,'supsonic(ae/at)',Geometry.exit_area/Geometry.throat_area,'reactants','fuel','C2H5OH(L)','wt%',Parameter.ethanol_ratio*100,'t(k)',Parameter.T,'fuel','H2O(L)','wt%',(1-Parameter.ethanol_ratio)*100,'t(k)',Parameter.T,'oxid','O2(L)','wt%',100,'t(k)',90.0,'output','transport','mks','end');
+    RKT1=CEA('problem','rocket','equilibrium','fac','ma,kg/s',Parameter.mass_flow,'o/f',Parameter.O_F_ratio,'p(psi)',Parameter.chamber_pressure/6894.76,'pi/p',Parameter.chamber_pressure/Parameter.ambient_pressure,'supsonic(ae/at)',Geometry.exit_area/Geometry.throat_area,'reactants','fuel','C2H5OH(L)','wt%',Parameter.ethanol_ratio*100,'t(k)',Parameter.T,'fuel','H2O(L)','wt%',(1-Parameter.ethanol_ratio)*100,'t(k)',Parameter.T,'oxid','O2(L)','wt%',100,'t(k)',90.0,'output','transport','mks','end');
     
     % Characteristic velocity and thrust coefficient are taken from CEA
     % output

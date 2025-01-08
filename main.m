@@ -22,10 +22,10 @@ Parameter.design = true;
 
 % Flow parameters for pre-defined geometry.
 if Parameter.design == false
-    Parameter.mass_flow           = 4.4068; % kg/s
-    Parameter.O_F_ratio           = 0.85; 
-    Parameter.chamber_pressure    = 300;    % psia
-    Parameter.ambient_pressure    = 14.7;   % psia
+    Parameter.mass_flow           = 4.41; % kg/s
+    Parameter.O_F_ratio           = 1.4; 
+    Parameter.chamber_pressure    = 313.7;    % psia
+    Parameter.ambient_pressure    = 13.7;   % psia
     Parameter.ethanol_ratio       = 0.75;
     Parameter.T                   = 365;    % K
     load('data.txt');
@@ -34,34 +34,34 @@ end
 
 % Parameters to design a new engine.
 if Parameter.design == true
-    Parameter.O_F_ratio           = 0.85;
-    Parameter.chamber_pressure    = 313.7;  % psia
+    Parameter.O_F_ratio           = 1;
+    Parameter.chamber_pressure    = 413.7;  % psia
     Parameter.ambient_pressure    = 13.7;   % psia
     Parameter.ethanol_ratio       = 0.75;
     Parameter.T                   = 365;    % K
     Parameter.thrust              = 2000;   % lbf
     Geometry.chamber_diameter     = 4.5;    % in
     Geometry.conv_angle           = 40;     % deg
-    Parameter.L_star              = 25;     % in
-    Parameter.resolution          = 200;
+    Parameter.L_star              = 30;     % in
+    Parameter.resolution          = 100;
 end
 
 %                                    exit    throat  conv    chamber
-Geometry.channel_height           = [0.001   0.001   0.001   0.00175]; % m
-Geometry.rib_width                = [0.001   0.001   0.001   0.001  ]; % m                    
-Geometry.inner_wall_thickness     = [0.002   0.001   0.001   0.001  ]; % m
-Geometry.outer_wall_thickness     = [0.002   0.0015  0.0015  0.0015 ]; % m
-Geometry.minimum_channel_width    = 0.001;                             % m
-Geometry.fillet                   = 0.0001250;                         % m radius
+Geometry.channel_height           = [0.0015   0.00075   0.001   0.00125]; % m
+Geometry.rib_width                = [0.00075   0.0015   0.00075   0.00075  ]; % m                    
+Geometry.inner_wall_thickness     = [0.00135   0.00045   0.00075   0.0015  ]; % m
+Geometry.outer_wall_thickness     = [0.0015   0.0015  0.0015  0.0015 ]; % m
+Geometry.minimum_channel_width    = 0.0015;                             % m
+Geometry.fillet                   = 0.00025;                         % m radius
 
-Geometry.pitch                   = 0;          % deg
+Geometry.pitch                   = 25;          % deg
 Parameter.C_star_efficiency      = 0.94;
 Parameter.C_F_efficiency         = 0.99;
 Parameter.ambient_temperature    = 300;         % K
 Parameter.res                    = 0.000381/1.5;   % thickness/conductivity (SI)
-Parameter.roughness              = 3.5e-5;      % m
+Parameter.roughness              = 180e-6;      % m
 
-Parameter.material               = 'aluminum';
+Parameter.material               = 'inconel';
 
 
 %% Conversions
@@ -240,12 +240,12 @@ grid on
 figure(6)
 title('Coolant Pressure')
 hold on
-plot(Geometry.axial_distance,Coolant.total_pressure(1:end-1),'LineWidth',2)
-plot(Geometry.axial_distance,Coolant.static_pressure,'LineWidth',2)
+plot(Geometry.axial_distance,Coolant.total_pressure(1:end-1)/6894.76,'LineWidth',2)
+plot(Geometry.axial_distance,Coolant.static_pressure/6894.76,'LineWidth',2)
 hold off
 legend('Total (Stagnation) Pressure','Static Pressure')
 xlabel('Axial Distance (m)')
-ylabel('Temperature (K)')
+ylabel('Pressure (psi)')
 grid on
 
 %% Figure 7: Inner Wall Stress.
